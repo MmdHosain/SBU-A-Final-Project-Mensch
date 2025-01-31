@@ -3,6 +3,8 @@ import pygame
 import FirstMenu as fir
 import ThirdMenu as thir
 import titles
+import sounds
+
 
 pygame.init()
 
@@ -17,7 +19,7 @@ GREEN = (0, 150, 0)
 
 font = pygame.font.Font(None, 48)
                         
-def second_menu(screen, WIDTH, HEIGHT):
+def second_menu(screen, WIDTH, HEIGHT, click_volume , music_volume ):
     
     player_count = 4
     bot_count = 0
@@ -27,7 +29,8 @@ def second_menu(screen, WIDTH, HEIGHT):
     while running:
         screen.fill(BIEGE)
         
-        titles.Main_title(screen,WIDTH)
+        lobby = 2
+        titles.Main_title(screen,WIDTH,lobby)
         
         
         # Display player and bot counts
@@ -89,13 +92,16 @@ def second_menu(screen, WIDTH, HEIGHT):
                 elif event.key == pygame.K_RETURN:
                     if selected_option == 2:
                         if player_count + bot_count >= 2: 
-                            thir.color_selecting(player_count, bot_count, player_count + bot_count ,screen, WIDTH, HEIGHT)  # Send client to color selecting section
+                            sounds.menu_click_sound_effect(click_volume)
+                            thir.color_selecting(player_count, bot_count, player_count + bot_count ,screen, WIDTH, HEIGHT,click_volume , music_volume)  # Send client to color selecting section
                             return player_count, bot_count  # Confirm selection
                     elif selected_option == 3:
-                        fir.Lobby(screen, WIDTH, HEIGHT)  # Go back to first lobby
+                        sounds.menu_click_sound_effect(click_volume)
+                        fir.Lobby(screen, WIDTH, HEIGHT,click_volume , music_volume )  # Go back to first lobby
                         return
                 elif event.key == pygame.K_ESCAPE:
-                    fir.Lobby(screen, WIDTH, HEIGHT)  # Go back to first lobby
+                    sounds.menu_click_sound_effect(click_volume)
+                    fir.Lobby(screen, WIDTH, HEIGHT,click_volume , music_volume)  # Go back to first lobby
                     return
         
         pygame.display.flip()

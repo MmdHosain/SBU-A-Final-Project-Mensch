@@ -1,6 +1,10 @@
 import pygame
 import SecondMenu as sec
 import visuals
+import sounds
+import titles
+
+
 
 pygame.init()
 
@@ -16,17 +20,26 @@ HIGHLIGHT_COLOR = (255, 0, 0)
 
 font = pygame.font.Font(None, 48)
 
-def color_selecting(players_count, bot_count, total, screen, WIDTH, HEIGHT):
+def color_selecting(players_count, bot_count, total, screen, WIDTH, HEIGHT,click_volume , music_volume):
     selected_colors = []
     colors = [RED, GREEN, BLUE, YELLOW]
-    color_positions = [(100, 50), (200, 50), (100, 150), (200, 150)]
+    color_positions = [(90, 50), (190, 50), (90, 150), (190, 150)]
     circle_radius = 35
     selected_option = 0
     selecting_colors = True
 
+
+
+
     running = True
     while running:
         screen.fill(BIEGE)
+        
+        
+        lobby = 3
+        titles.Main_title(screen,WIDTH,lobby)
+        
+        
         
         # Draw color circles
         for i, color in enumerate(colors):
@@ -44,8 +57,8 @@ def color_selecting(players_count, bot_count, total, screen, WIDTH, HEIGHT):
         
         confirm_text = font.render("Start Game", True, confirm_color)
         back_text = font.render("Back", True, back_color)
-        screen.blit(confirm_text, (75, 250))
-        screen.blit(back_text, (75, 320))
+        screen.blit(confirm_text, (55, 210))
+        screen.blit(back_text, (110, 260))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -65,13 +78,15 @@ def color_selecting(players_count, bot_count, total, screen, WIDTH, HEIGHT):
                             selecting_colors = False
                             selected_option = len(colors)  # Automatically move to the confirm button
                     elif event.key == pygame.K_ESCAPE:
-                        return sec.second_menu(screen, WIDTH, HEIGHT)  # Go back to second lobby
+                        sounds.menu_click_sound_effect(click_volume)
+                        return sec.second_menu(screen, WIDTH, HEIGHT,click_volume , music_volume)  # Go back to second lobby
                 else:
                     if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                         selected_option = len(colors) + (selected_option - len(colors) + 1) % 2
                     elif event.key == pygame.K_RETURN:
                         if selected_option == len(colors):
-                            visuals.board()
+                            sounds.menu_click_sound_effect(click_volume)
+                            visuals.board(click_volume , music_volume) ##########
                             return selected_colors
                         elif selected_option == len(colors) + 1:
                             selecting_colors = True

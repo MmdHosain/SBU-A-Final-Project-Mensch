@@ -1,10 +1,12 @@
 
-
-
 import pygame
 import SecondMenu as sec
 import how_to_play as howt
 import titles
+import sounds
+import options
+
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -21,18 +23,19 @@ LIGHT_YELLOW = (255, 255, 102)
 
 menu_font = pygame.font.Font(None, 48)
 
-def Lobby(screen, WIDTH, HEIGHT ):
+def Lobby(screen, WIDTH, HEIGHT,click_volume , music_volume ):
     screen.fill(BIEGE)
     
     
-    First_menu_options = ["Start", "How To Play", "Exit"]
+    First_menu_options = ["Start", "Option","How To Play", "Exit"]
     
     selected_option = 0
     running = True
     while running:
         
         # calling title printer      
-        titles.Main_title(screen, WIDTH )
+        lobby = 1
+        titles.Main_title(screen,WIDTH,lobby)
         
     
         # Render menu options
@@ -62,10 +65,22 @@ def Lobby(screen, WIDTH, HEIGHT ):
                 elif event.key == pygame.K_RETURN:
                     
                     if selected_option == 0:
-                        sec.second_menu(screen, WIDTH, HEIGHT)  # Start Game
+                        sounds.menu_click_sound_effect(click_volume)
+                        sec.second_menu(screen, WIDTH, HEIGHT, click_volume , music_volume )  # going to next menu
                     elif selected_option == 1:
-                        howt.how_to_play(WIDTH)  # How To Play
+                        
+                        WIDTH, HEIGHT = 400, 300
+                        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                        pygame.display.set_caption("Mensch")
+                        
+                        sounds.menu_click_sound_effect(click_volume)
+                        
+                        options.option(screen, WIDTH, HEIGHT,click_volume , music_volume) # going to option
                     elif selected_option == 2:
+                        sounds.menu_click_sound_effect(click_volume)
+                        howt.how_to_play(WIDTH, click_volume, music_volume)  # How To Play
+                    elif selected_option == 3:
+                        sounds.menu_click_sound_effect(click_volume)
                         running = False
         
         pygame.display.flip()

@@ -18,14 +18,14 @@ LIGHT_RED = (255, 104, 101)
 LIGHT_BLUE = (173, 216, 230)
 LIGHT_YELLOW = (255, 255, 102)
 
-def board():
+def board(click_volume , music_volume):
     # Initialize Pygame
     pygame.init()
 
     # Set initial width and height
     WIDTH, HEIGHT = 600, 600
     screen_board = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Board")
+    pygame.display.set_caption("Mnech")
     screen_board.fill(BIEGE)
 
     running = True
@@ -38,49 +38,37 @@ def board():
                 running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    result = con.confirm(screen_board, selected_option, WIDTH, HEIGHT)
-                    if result == False :
-                        running = True
-                    else : pass
-                    
-                elif confirm_exit:
-                    if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                        selected_option = (selected_option + 1) % 2
-                    elif event.key == pygame.K_RETURN:
-                        if selected_option == 0:  # Yes
-                            running = False
-                            WIDTH, HEIGHT = 300, 400
-                            screen = pygame.display.set_mode((WIDTH, HEIGHT))
-                            
-                            fir.Lobby(screen, WIDTH, HEIGHT)
-                            return
-                        elif selected_option == 1:  # No
-                            confirm_exit = False
-
-        screen_board.fill(BIEGE)
+                    WIDTH, HEIGHT = 300, 400
+                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                    pygame.display.set_caption("Mensch")
+                    fir.Lobby(screen, WIDTH, HEIGHT,click_volume , music_volume )
+                    confirm_exit = True
+                
 
         # if confirm_exit:
         #     # Draw confirmation box
-        #     result = con.confirm(screen_board, confirm_exit, selected_option, WIDTH, HEIGHT)
-        #     if result == False :
-        #         running = True
+        #     result = con.confirm(screen_board, selected_option)
+        #     if result is False:
+        #         confirm_exit = False
+        #     elif result is True:
+        #         running = False
 
-        
 
-         
                         
-    # Get mouse position
+    # making dice work with keyboard and mouse
         def dice_loc(screen_board) :
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_d:
-                    
-                        return dice.dice_roll(screen_board)
+                    return dice.dice_roll(screen_board)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                
                 mouse_pos = pygame.mouse.get_pos()
-                if 260 <= mouse_pos[0] <= 340 and 260 <= mouse_pos[1] <= 340 :
+                if 260 <= mouse_pos[0] <= 340 and 260 <= mouse_pos[1] <= 340:
+                    
                     return dice.dice_roll(screen_board)  # use dice by click on it
                 
-                else :
-                    pass
+            else :
+                pass
             
             
         def start_end():
