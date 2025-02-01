@@ -341,7 +341,7 @@ def show_how_to_play():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:  # Press ESC to return
+                if event.key == pygame.K_ESCAPE:  # Press ESC to quit
                     running = False
 
         # Fill the background
