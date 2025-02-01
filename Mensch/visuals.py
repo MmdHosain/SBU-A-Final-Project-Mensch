@@ -152,18 +152,15 @@ def start_end(screen_board):
             pygame.draw.circle(screen_board, LIGHT_YELLOW, (410, 300), 20)
             pygame.draw.circle(screen_board, LIGHT_YELLOW, (360, 300), 20)
  
-def movepiece(turn , dice_number) :
-    print(turn)
-    print(dice_number)   
-    print("@")
+
     
 def board(click_volume , music_volume, selected_colors):
     # print(type(selected_colors[0]))
     str_selected_colors = []
-    colors = ["red", "green", "blue", "yellow"]
+    colors = ["red", "green", "yellow", "blue"]
     for item  in selected_colors :
         tmp = colors[item]
-        print(tmp)
+        
         str_selected_colors.append(tmp)
     
     first_player = random.choice(str_selected_colors)
@@ -179,17 +176,13 @@ def board(click_volume , music_volume, selected_colors):
     screen_board.fill(BIEGE)
 
     
-    confirm_exit = False
-    selected_option = 0
-
-    
           
     path_way(screen_board)
     arrows(screen_board)
     start_end(screen_board)
     
     pygame.display.flip()
-    move.main(screen_board)
+    move.main(screen_board, str_selected_colors)
     # while running: 
         
         # for event in pygame.event.get():
@@ -223,26 +216,7 @@ def board(click_volume , music_volume, selected_colors):
         #     elif result is True:
         #         running = False
         
-        
-    # turn = 1
-    # running = True
-    # flag = False
-    # dice_number = 0
-    # while running :
-    #     if flag :
-    #         movepiece(dice_number, turn )
-    #         flag = False
-    #         turn += 1
-    #         if turn  == 5: 
-    #             turn = 1
-    #     for event in pygame.event.get():
-    #         if event.type == pygame.QUIT:
-    #             running = False
-    #         elif event.type == pygame.KEYDOWN:
-    #             if event.key == pygame.K_SPACE :
-    #                 dice_number = dice.dice_roll(screen_board)
-    #                 flag  = True
-                    
+
 
     pygame.quit()
 

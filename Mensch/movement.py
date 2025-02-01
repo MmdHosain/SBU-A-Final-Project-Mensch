@@ -1,8 +1,24 @@
 import pygame
-import visuals
 import dice
 import sounds
-import random
+
+
+
+# Colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (230, 0, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 230, 0)
+GREEN = (0, 150, 0)
+BIEGE = (200, 174, 126)
+LIGHT_GREEN = (144, 238, 144)
+LIGHT_RED = (255, 104, 101)
+LIGHT_BLUE = (173, 216, 230)
+LIGHT_YELLOW = (255, 255, 102)
+
+
+
 road_map_x = tuple([40, 90, 140, 190, 240, 240, 240, 240, 240, 300, 
                 360, 360, 360, 360, 360, 410, 460, 510, 560,560, 
                 560, 510, 460, 410, 360, 360, 360, 360, 360, 300,
@@ -22,63 +38,58 @@ cordinates = ((40, 250), (90, 250), (140, 250), (190, 250), (240, 250),
               (240, 550), (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300))
 
+
 road_map = {
 "red" : ((40, 250), (90, 250), (140, 250), (190, 250), (240, 250), 
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50),
-              (360, 50), (360, 100), (360, 150), (360, 200), (360, 250), 
+              (360, 100), (360, 150), (360, 200), (360, 250), 
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
-              (560, 350), (510, 350), (460, 350), (410, 350), (360, 350), 
+               (510, 350), (460, 350), (410, 350), (360, 350), 
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
-              (240, 550), (240, 500), (240, 450), (240, 400), (240, 350), 
+               (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
               (90, 300), (140, 300), (190, 300), (240, 300)),
 
 "green" : ((360, 50), (360, 100), (360, 150), (360, 200), (360, 250), 
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
-              (560, 350), (510, 350), (460, 350), (410, 350), (360, 350), 
+               (510, 350), (460, 350), (410, 350), (360, 350), 
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
-              (240, 550), (240, 500), (240, 450), (240, 400), (240, 350), 
+              (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
-              (40, 250),(90, 250), (140, 250), (190, 250), (240, 250), 
+              (90, 250), (140, 250), (190, 250), (240, 250), 
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50), 
               (300, 100), (300, 150), (300, 200), (300, 250)),
 
 "yellow" : ((560, 350), (510, 350), (460, 350), (410, 350), (360, 350), 
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
-              (240, 550), (240, 500), (240, 450), (240, 400), (240, 350), 
+               (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
-              (40, 250), (90, 250), (140, 250), (190, 250), (240, 250), 
+               (90, 250), (140, 250), (190, 250), (240, 250), 
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50),
-              (360, 50), (360, 100), (360, 150), (360, 200), (360, 250), 
+               (360, 100), (360, 150), (360, 200), (360, 250), 
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
               (510,300), (460, 300), (410,300), (360, 300)),
 
 "blue" : ((240, 550), (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
-              (40, 250), (90, 250), (140, 250), (190, 250), (240, 250), 
+               (90, 250), (140, 250), (190, 250), (240, 250), 
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50),
-              (360, 50), (360, 100), (360, 150), (360, 200), (360, 250), 
+              (360, 100), (360, 150), (360, 200), (360, 250), 
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
-              (560, 350), (510, 350), (460, 350), (410, 350), (360, 350), 
+               (510, 350), (460, 350), (410, 350), (360, 350), 
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
               (300, 500), (300, 450), (300, 400), (300, 350))
 }
 
+starting_sections = {
+    
+    "red" :[(50, 40) ,(120, 40),(50, 120) ,(120,120)],
+    "blue" : [(50, 560),(120, 560),(50, 480),(120, 480)],
+    "green": [(550, 40), (480, 120),(480, 40),(550, 120)],
+    "yellow" :[(550, 560),(480, 560), (480, 480),(550 ,480)]    
+}
 
-# Colors
-RED = (230, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 150, 0)
-YELLOW = (255, 230, 0)
-WHITE = (255, 255, 255)
-BIEGE = (200, 174, 126)
-LIGHT_RED = (255, 102, 102)
-LIGHT_BLUE = (102, 178, 255)
-LIGHT_GREEN = (102, 255, 102)
-LIGHT_YELLOW = (255, 255, 102)
-BLACK = (0, 0, 0)
 
-# Coordinates for the pieces
 
 # Player pieces
 player_pieces = {
@@ -88,49 +99,42 @@ player_pieces = {
     "yellow": {"piece1": None, "piece2": None, "piece3": None, "piece4": None}
 }
 
-
-
-# def dice_loc(screen_board,):
-#         if event.type == pygame.KEYDOWN:
-#             if event.key == pygame.K_d:
-                
-                # dice_number = dice.dice_roll(screen_board)
-                
-                
-
-#                 # print(dice_number)   
-               
-#         elif .type == pygame.MOUSEBUTTONDOWN:
-#             mouse_pos = pygame.mouse.get_pos()
-#             if 260 <= mouse_pos[0] <= 340 and 260 <= mouse_pos[1] <= 340:
-                
-#                 dice_number = dice.dice_roll(screen_board)  # use dice by click on it
-                
-            
-
-
-
+red_counter = -1
+green_counter = -1
+blue_counter = -1
+yellow_counter= -1
 
 
 def draw_pieces(screen, positions, color):
+    
     for pos in positions:
-        pygame.draw.circle(screen, color, pos, 20)
+        pygame.draw.circle(screen, color, pos, 15)
 
-def draw_starting_piece(screen, position, color):
-    pygame.draw.circle(screen, color, position, 20)
-    pygame.draw.circle(screen, WHITE, position, 10)
+def draw_starting_piece(screen, position, color, current_color):
+    if current_color == "red" :
+        pygame.draw.circle(screen, BIEGE, starting_sections[current_color][red_counter] , 15)
+    elif current_color == "green":
+        pygame.draw.circle(screen, BIEGE, starting_sections[current_color][green_counter] , 15)
+    elif current_color == "blue" :
+        pygame.draw.circle(screen, BIEGE, starting_sections[current_color][blue_counter] , 15)
+    elif current_color == "yellow" :
+        pygame.draw.circle(screen, BIEGE, starting_sections[current_color][yellow_counter] , 15)
+        
 
-def roll_dice():
-    return random.randint(1, 6)
+    pygame.draw.circle(screen, color, position, 15)
+    
+
+
 
 def ask_to_add_piece(screen, color):
-    font = pygame.font.Font(None, 36)
+    font = pygame.font.Font(None, 26)
     text_surface = font.render(f"Add a {color} piece? (Y/N)", True, BLACK)
-    text_rect = text_surface.get_rect(center=(300, 300))
+    text_rect = text_surface.get_rect(center=(490, 210))
     screen.blit(text_surface, text_rect)
-    pygame.display.flip()
+    pygame.display.update()
 
     waiting_for_response = True
+    response = False
     while waiting_for_response:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -138,55 +142,108 @@ def ask_to_add_piece(screen, color):
                 exit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_y:
-                    return True
+                    response = True
+                    waiting_for_response = False
+                    
                 elif event.key == pygame.K_n:
-                    return False
+                    response = False
+                    waiting_for_response = False
 
-def move_piece(screen, color, piece):
-    if player_pieces[color][piece] is not None:
-        player_pieces[color][piece] += 1
-        if player_pieces[color][piece] >= len(road_map[color]):
-            player_pieces[color][piece] = len(road_map[color]) - 1
-          # Draw the main board
-        for piece in player_pieces["red"]:
-            if player_pieces["red"][piece] is not None:
-                draw_pieces(screen, [road_map["red"][player_pieces["red"][piece]]], RED)
-        for piece in player_pieces["blue"]:
-            if player_pieces["blue"][piece] is not None:
-                draw_pieces(screen, [road_map["blue"][player_pieces["blue"][piece]]], BLUE)
-        for piece in player_pieces["green"]:
-            if player_pieces["green"][piece] is not None:
-                draw_pieces(screen, [road_map["green"][player_pieces["green"][piece]]], GREEN)
-        for piece in player_pieces["yellow"]:
-            if player_pieces["yellow"][piece] is not None:
-                draw_pieces(screen, [road_map["yellow"][player_pieces["yellow"][piece]]], YELLOW)
-        pygame.display.flip()
-        
-def move(screen, dice_number, turn ) :
-    colors = ["red", "green", "blue", "yellow"]
-    current_color = colors[turn-1]
+    # Clear the prompt after response
+    screen.fill(BIEGE, text_rect)
     
+    pygame.display.update()
+
+    return response
+    
+    
+
+
+def move_piece(screen, color, piece, dice_number):
+    if player_pieces[color][piece] is not None:
+        
+        if player_pieces[color][piece] == 0 :
+            if color == "red" :
+                pygame.draw.circle(screen, LIGHT_RED ,road_map[color][player_pieces[color][piece]], 20)
+            elif color == "green" : 
+                pygame.draw.circle(screen, LIGHT_GREEN,road_map[color][player_pieces[color][piece]], 20)
+            elif color == "blue" :
+                pygame.draw.circle(screen, LIGHT_BLUE ,road_map[color][player_pieces[color][piece]], 20)
+            elif color == "yellow" :
+                pygame.draw.circle(screen, LIGHT_YELLOW ,road_map[color][player_pieces[color][piece]], 20)
+        else :
+            pygame.draw.circle(screen, WHITE ,road_map[color][player_pieces[color][piece]], 20)
+        
+        
+        player_pieces[color][piece] += dice_number
+        if player_pieces[color][piece] >= len(road_map[color]):
+            pass
+        else :
+        
+            for piece in player_pieces["red"]:
+                if player_pieces["red"][piece] is not None:
+                    draw_pieces(screen, [road_map["red"][player_pieces["red"][piece]]], RED)
+            for piece in player_pieces["blue"]:
+                if player_pieces["blue"][piece] is not None:
+                    draw_pieces(screen, [road_map["blue"][player_pieces["blue"][piece]]], BLUE)
+            for piece in player_pieces["green"]:
+                if player_pieces["green"][piece] is not None:
+                    draw_pieces(screen, [road_map["green"][player_pieces["green"][piece]]], GREEN)
+            for piece in player_pieces["yellow"]:
+                if player_pieces["yellow"][piece] is not None:
+                    draw_pieces(screen, [road_map["yellow"][player_pieces["yellow"][piece]]], YELLOW)
+            pygame.display.flip()
+        
+        
+        
+def move(screen, dice_number, turn, str_selected_colors ) :
+    
+    current_color = str_selected_colors[turn-1]
+    
+    print(f"current turn : {current_color}")
     if dice_number == 6:
+        for piece in player_pieces[current_color]:
+                    if  player_pieces[current_color][piece] == 0 :
+                        for piece in player_pieces[current_color]:
+                            if player_pieces[current_color][piece] is not None:
+                                move_piece(screen, current_color, piece, dice_number)
+                                break
+            
         if ask_to_add_piece(screen, current_color):
             for piece in player_pieces[current_color]:
-                if player_pieces[current_color][piece] is None:
+                        
+                if player_pieces[current_color][piece] is None :
                     player_pieces[current_color][piece] = 0
+                   
                     if current_color == "red":
-                        draw_starting_piece(screen, road_map["red"][0], LIGHT_RED)
+                        global red_counter 
+                        red_counter += 1
+                        draw_starting_piece(screen, road_map["red"][0], LIGHT_RED, current_color)
                     elif current_color == "blue":
-                        draw_starting_piece(screen, road_map["blue"][0], LIGHT_BLUE)
+                        global blue_counter 
+                        blue_counter += 1
+                        draw_starting_piece(screen, road_map["blue"][0], LIGHT_BLUE, current_color)
                     elif current_color == "green":
-                        draw_starting_piece(screen, road_map["green"][0], LIGHT_GREEN)
+                        global green_counter 
+                        green_counter += 1
+                        draw_starting_piece(screen, road_map["green"][0], LIGHT_GREEN, current_color)
                     elif current_color == "yellow":
-                        draw_starting_piece(screen, road_map["yellow"][0], LIGHT_YELLOW)
+                        global yellow_counter 
+                        yellow_counter += 1
+                        draw_starting_piece(screen, road_map["yellow"][0], LIGHT_YELLOW, current_color)
                     break
+        else :
+            main(screen, str_selected_colors)
     else:
         for piece in player_pieces[current_color]:
             if player_pieces[current_color][piece] is not None:
-                move_piece(screen, current_color, piece)
+                move_piece(screen, current_color, piece, dice_number)
                 break
-def main(screen):
-    clock = pygame.time.Clock()
+            
+            
+            
+def main(screen,str_selected_colors):
+    
 
     
     running = True
@@ -198,10 +255,10 @@ def main(screen):
 
     while running :
         if flag :
-            move(screen , dice_number, turn)
+            move(screen , dice_number, turn, str_selected_colors)
             flag = False
             turn += 1
-            if turn  == 5: 
+            if turn  == len(str_selected_colors ) +1: 
                 turn = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -211,55 +268,10 @@ def main(screen):
                     dice_number = dice.dice_roll(screen)
                     flag  = True
         
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         running = False
-        #     elif event.type == pygame.KEYDOWN:
         
-        #             print(f"Dice rolled: {dice_number}")
-        #             if dice_number == 6:
-        #                 if ask_to_add_piece(screen, current_color):
-        #                     for piece in player_pieces[current_color]:
-        #                         if player_pieces[current_color][piece] is None:
-        #                             player_pieces[current_color][piece] = 0
-        #                             if current_color == "red":
-        #                                 draw_starting_piece(screen, road_map["red"][0], LIGHT_RED)
-        #                             elif current_color == "blue":
-        #                                 draw_starting_piece(screen, road_map["blue"][0], LIGHT_BLUE)
-        #                             elif current_color == "green":
-        #                                 draw_starting_piece(screen, road_map["green"][0], LIGHT_GREEN)
-        #                             elif current_color == "yellow":
-        #                                 draw_starting_piece(screen, road_map["yellow"][0], LIGHT_YELLOW)
-        #                             break
-        #             else:
-        #                 for piece in player_pieces[current_color]:
-        #                     if player_pieces[current_color][piece] is not None:
-        #                         move_piece(screen, current_color, piece)
-        #                         break
-            
-                   
-                        
-                        
-                        
-                        
-                        
-
-      
-        for piece in player_pieces["red"]:
-            if player_pieces["red"][piece] is not None:
-                draw_pieces(screen, [road_map["red"][player_pieces["red"][piece]]], RED)
-        for piece in player_pieces["blue"]:
-            if player_pieces["blue"][piece] is not None:
-                draw_pieces(screen, [road_map["blue"][player_pieces["blue"][piece]]], BLUE)
-        for piece in player_pieces["green"]:
-            if player_pieces["green"][piece] is not None:
-                draw_pieces(screen, [road_map["green"][player_pieces["green"][piece]]], GREEN)
-        for piece in player_pieces["yellow"]:
-            if player_pieces["yellow"][piece] is not None:
-                draw_pieces(screen, [road_map["yellow"][player_pieces["yellow"][piece]]], YELLOW)
-
+    
         pygame.display.flip()
-        clock.tick(1)  # Control the frame rate
+        
 
     pygame.quit()
 
