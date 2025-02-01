@@ -84,7 +84,7 @@ RED = (230, 0, 0)
 GREEN = (0, 150, 0)
 TRANSPARENT_BLACK = (0, 0, 0, 128)
 
-def confirm(screen_board, selected_option):
+def confirm(screen_board, selected_option, click_volume,music_volume):
     # Create a semi-transparent surface
     overlay = pygame.Surface((screen_board.get_width(), screen_board.get_height()), pygame.SRCALPHA)
     
@@ -94,7 +94,8 @@ def confirm(screen_board, selected_option):
     pygame.draw.rect(overlay, WHITE, (160, 210, 280, 180))
 
     font = pygame.font.Font(None, 36)
-    text_surface = font.render("Are you sure you want to exit?", True, BLACK)
+    text_surface = font.render("""Are you sure 
+                               you want to exit?""", True, BLACK)
     overlay.blit(text_surface, (180, 230))
 
     yes_color = RED if selected_option == 0 else BLACK
@@ -123,7 +124,7 @@ def confirm(screen_board, selected_option):
                         WIDTH, HEIGHT = 300, 400
                         screen = pygame.display.set_mode((WIDTH, HEIGHT))
                         pygame.display.set_caption("Mensch")
-                        fir.Lobby(screen, WIDTH, HEIGHT)
+                        fir.Lobby(screen, WIDTH, HEIGHT, click_volume, music_volume)
                         return True
                     elif selected_option == 1:  # No
                         return False

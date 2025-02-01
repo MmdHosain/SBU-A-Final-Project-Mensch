@@ -39,7 +39,7 @@ def color_selecting(players_count, bot_count, total, screen, WIDTH, HEIGHT,click
         lobby = 3
         titles.Main_title(screen,WIDTH,lobby)
         
-        
+       
         
         # Draw color circles
         for i, color in enumerate(colors):
@@ -86,15 +86,15 @@ def color_selecting(players_count, bot_count, total, screen, WIDTH, HEIGHT,click
                     elif event.key == pygame.K_RETURN:
                         if selected_option == len(colors):
                             sounds.menu_click_sound_effect(click_volume)
-                            visuals.board(click_volume , music_volume) ##########
+                            visuals.board(click_volume , music_volume, selected_colors) ##########
                             return selected_colors
                         elif selected_option == len(colors) + 1:
                             selecting_colors = True
                     elif event.key == pygame.K_ESCAPE:
+                        
                         selecting_colors = True
-
         pygame.display.flip()
+   
 
     pygame.quit()
-
 

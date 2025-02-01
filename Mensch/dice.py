@@ -1,15 +1,18 @@
 
-
-
 import random
 import pygame
 import os
 import sounds
 pygame.init()
 
+
+
+
+
 def dice_roll(screen):
     base_path = os.path.dirname(__file__)
     dice_number = random.randint(1, 6)
+    
     sounds.dice_sound_effect()
 
     def dice_image(screen, dice_number):
@@ -23,5 +26,6 @@ def dice_roll(screen):
         pygame.display.update()
 
     dice_image(screen, dice_number)
-
-    pygame.time.wait(2000)
+    
+    
+    return dice_number

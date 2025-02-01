@@ -3,7 +3,8 @@ import SecondMenu as sec
 import FirstMenu as fir
 import dice 
 import confirmation as con
-
+import movement as move
+import random
 # colors
 
 WHITE = (255, 255, 255)
@@ -18,60 +19,88 @@ LIGHT_RED = (255, 104, 101)
 LIGHT_BLUE = (173, 216, 230)
 LIGHT_YELLOW = (255, 255, 102)
 
-def board(click_volume , music_volume):
-    # Initialize Pygame
-    pygame.init()
 
-    # Set initial width and height
-    WIDTH, HEIGHT = 600, 600
-    screen_board = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Mnech")
-    screen_board.fill(BIEGE)
+def path_way(screen_board):
+    """create path of pieces path of pieces""" 
+    x = 40 
+    y = 250
+    for i in range(1, 40):
+        if x < 240 and y == 250:
+            while x < 240:
+                pygame.draw.circle(screen_board, WHITE, (x, y), 20)
+                x += 50
+        elif x == 240 and y <= 250:
+            while y >= 50:
+                pygame.draw.circle(screen_board, WHITE, (x, y), 20)
+                y -= 50
 
-    running = True
-    confirm_exit = False
-    selected_option = 0
-
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    WIDTH, HEIGHT = 300, 400
-                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-                    pygame.display.set_caption("Mensch")
-                    fir.Lobby(screen, WIDTH, HEIGHT,click_volume , music_volume )
-                    confirm_exit = True
-                
-
-        # if confirm_exit:
-        #     # Draw confirmation box
-        #     result = con.confirm(screen_board, selected_option)
-        #     if result is False:
-        #         confirm_exit = False
-        #     elif result is True:
-        #         running = False
-
-
-                        
-    # making dice work with keyboard and mouse
-        def dice_loc(screen_board) :
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_d:
-                    return dice.dice_roll(screen_board)
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                
-                mouse_pos = pygame.mouse.get_pos()
-                if 260 <= mouse_pos[0] <= 340 and 260 <= mouse_pos[1] <= 340:
+            x = 360   
+            if x == 360 and y == 0:
+                while y < 250:
+                    y += 50
+                    pygame.draw.circle(screen_board, WHITE, (x, y), 20)
                     
-                    return dice.dice_roll(screen_board)  # use dice by click on it
-                
-            else :
-                pass
+            if x == 360 and y == 250:
+                while x <= 550:
+                    x += 50
+                    pygame.draw.circle(screen_board, WHITE, (x, y), 20)
             
+            y = 350
+            if x == 560 and y == 350:
+                while x > 360:
+                    pygame.draw.circle(screen_board, WHITE, (x, y), 20)
+                    x -= 50
             
-        def start_end():
+            if x == 360 and y == 350:
+                while y <= 550:
+                    pygame.draw.circle(screen_board, WHITE, (x, y), 20)
+                    if y == 550:
+                        break
+                    y += 50
+                    
+            x = 240       
+            if x == 240 and y == 550:
+                while y > 350:
+                    pygame.draw.circle(screen_board, WHITE, (x, y), 20)
+                    y -= 50
+            if x == 240 and y == 350:
+                while x >= 40:
+                    pygame.draw.circle(screen_board, WHITE, (x, y), 20)
+                    x -= 50
+                    
+    #start location
+    pygame.draw.circle(screen_board, LIGHT_RED, (40,250 ), 20)
+    pygame.draw.circle(screen_board, LIGHT_GREEN, (360, 50), 20)
+    pygame.draw.circle(screen_board, LIGHT_BLUE, (240, 550), 20)
+    pygame.draw.circle(screen_board, LIGHT_YELLOW, (560, 350), 20)
+    
+    pygame.draw.circle(screen_board, WHITE, (40, 300), 20)
+    pygame.draw.circle(screen_board, WHITE, (40, 300), 20)
+    pygame.draw.circle(screen_board, WHITE, (300, 50), 20)
+    pygame.draw.circle(screen_board, WHITE, (300, 550), 20)
+    pygame.draw.circle(screen_board, WHITE, (560, 300), 20)
+
+def arrows(screen_board):
+    # Horizontal arrow
+    #Red
+    pygame.draw.line(screen_board, BLACK, (40, 200), (100, 200), 8)
+    pygame.draw.line(screen_board, BLACK, (100, 200), (90, 190), 8)
+    pygame.draw.line(screen_board, BLACK, (100, 200), (90, 210), 8)
+    #Yellow
+    pygame.draw.line(screen_board, BLACK, (560, 400), (500, 400), 8)
+    pygame.draw.line(screen_board, BLACK, (500, 400), (510, 390), 8)
+    pygame.draw.line(screen_board, BLACK, (500, 400), (510, 410), 8)
+    
+    #vertical arrow
+    #Green
+    pygame.draw.line(screen_board, BLACK, (410, 50), (410, 110), 8)
+    pygame.draw.line(screen_board, BLACK, (410, 110), (420, 100), 8)
+    pygame.draw.line(screen_board, BLACK, (410, 110), (400, 100), 8)
+    #Blue
+    pygame.draw.line(screen_board, BLACK, (190, 550), (190, 490), 8)
+    pygame.draw.line(screen_board, BLACK, (190, 490), (180, 500), 8)
+    pygame.draw.line(screen_board, BLACK, (190, 490), (200, 500), 8)
+def start_end(screen_board):
 
             # Draw starter pieces location  - Red
             pygame.draw.circle(screen_board, RED, (50, 40), 20)  
@@ -122,109 +151,102 @@ def board(click_volume , music_volume):
             pygame.draw.circle(screen_board, LIGHT_YELLOW, (460, 300), 20) 
             pygame.draw.circle(screen_board, LIGHT_YELLOW, (410, 300), 20)
             pygame.draw.circle(screen_board, LIGHT_YELLOW, (360, 300), 20)
-        
-        
-        def path_way():
-            """create path of pieces path of pieces""" 
-            x = 40 
-            y = 250
-            for i in range(1, 40):
-                if x < 240 and y == 250:
-                    while x < 240:
-                        pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                        x += 50
-                elif x == 240 and y <= 250:
-                    while y >= 50:
-                        pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                        y -= 50
+ 
+def movepiece(turn , dice_number) :
+    print(turn)
+    print(dice_number)   
+    print("@")
+    
+def board(click_volume , music_volume, selected_colors):
+    # print(type(selected_colors[0]))
+    str_selected_colors = []
+    colors = ["red", "green", "blue", "yellow"]
+    for item  in selected_colors :
+        tmp = colors[item]
+        print(tmp)
+        str_selected_colors.append(tmp)
+    
+    first_player = random.choice(str_selected_colors)
+    print(first_player)
+    # Initialize Pygame
+    pygame.init()
 
-                    x = 360   
-                    if x == 360 and y == 0:
-                        while y < 250:
-                            y += 50
-                            pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                            
-                    if x == 360 and y == 250:
-                        while x <= 550:
-                            x += 50
-                            pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                    
-                    y = 350
-                    if x == 560 and y == 350:
-                        while x > 360:
-                            pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                            x -= 50
-                    
-                    if x == 360 and y == 350:
-                        while y <= 550:
-                            pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                            if y == 550:
-                                break
-                            y += 50
-                            
-                    x = 240       
-                    if x == 240 and y == 550:
-                        while y > 350:
-                            pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                            y -= 50
-                    if x == 240 and y == 350:
-                        while x >= 40:
-                            pygame.draw.circle(screen_board, WHITE, (x, y), 20)
-                            x -= 50
-                            
-            #start location
-            pygame.draw.circle(screen_board, LIGHT_RED, (40,250 ), 20)
-            pygame.draw.circle(screen_board, LIGHT_GREEN, (360, 50), 20)
-            pygame.draw.circle(screen_board, LIGHT_BLUE, (240, 550), 20)
-            pygame.draw.circle(screen_board, LIGHT_YELLOW, (560, 350), 20)
-            
-            pygame.draw.circle(screen_board, WHITE, (40, 300), 20)
-            pygame.draw.circle(screen_board, WHITE, (40, 300), 20)
-            pygame.draw.circle(screen_board, WHITE, (300, 50), 20)
-            pygame.draw.circle(screen_board, WHITE, (300, 550), 20)
-            pygame.draw.circle(screen_board, WHITE, (560, 300), 20)
-        
-                    
+    # Set initial width and height
+    WIDTH, HEIGHT = 600, 600
+    screen_board = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("Board")
+    
+    screen_board.fill(BIEGE)
 
-        def arrows():
-            
-        
-            # Horizontal arrow
-            #Red
-            pygame.draw.line(screen_board, BLACK, (40, 200), (100, 200), 8)
-            pygame.draw.line(screen_board, BLACK, (100, 200), (90, 190), 8)
-            pygame.draw.line(screen_board, BLACK, (100, 200), (90, 210), 8)
-            #Yellow
-            pygame.draw.line(screen_board, BLACK, (560, 400), (500, 400), 8)
-            pygame.draw.line(screen_board, BLACK, (500, 400), (510, 390), 8)
-            pygame.draw.line(screen_board, BLACK, (500, 400), (510, 410), 8)
-            
-            #vertical arrow
-            #Green
-            pygame.draw.line(screen_board, BLACK, (410, 50), (410, 110), 8)
-            pygame.draw.line(screen_board, BLACK, (410, 110), (420, 100), 8)
-            pygame.draw.line(screen_board, BLACK, (410, 110), (400, 100), 8)
-            #Blue
-            pygame.draw.line(screen_board, BLACK, (190, 550), (190, 490), 8)
-            pygame.draw.line(screen_board, BLACK, (190, 490), (180, 500), 8)
-            pygame.draw.line(screen_board, BLACK, (190, 490), (200, 500), 8)
-            
-        dice_loc(screen_board)
-        path_way()
-        arrows()
-        start_end()
-        
-        # Update the display
-        pygame.display.flip()
-   
+    
+    confirm_exit = False
+    selected_option = 0
 
+    
+          
+    path_way(screen_board)
+    arrows(screen_board)
+    start_end(screen_board)
+    
     pygame.display.flip()
-    
+    move.main(screen_board)
+    # while running: 
+        
+        # for event in pygame.event.get():
+        #     if event.type == pygame.QUIT:
+        #         running = False
+            # elif event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_ESCAPE:
+            #         confirm_exit = True
+            #     elif confirm_exit:
+            #         if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+            #             selected_option = (selected_option + 1) % 2
+            #         elif event.key == pygame.K_RETURN:
+            #             if selected_option == 0:  # Yes
+            #                 running = False
+            #                 WIDTH, HEIGHT = 300, 400
+            #                 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+            #                 fir.Lobby(screen, WIDTH, HEIGHT,click_volume, music_volume )
+            #                 return
+            #             elif selected_option == 1:  # No
+            #                 confirm_exit = False
+            #     else:
+            #         dice_loc( screen_board)
+
+        
+
+        # if confirm_exit:
+        #     # Draw confirmation box
+        #     result = con.confirm(screen_board, selected_option,click_volume,music_volume)
+        #     if result is False:
+        #         confirm_exit = False
+        #     elif result is True:
+        #         running = False
+        
+        
+    # turn = 1
+    # running = True
+    # flag = False
+    # dice_number = 0
+    # while running :
+    #     if flag :
+    #         movepiece(dice_number, turn )
+    #         flag = False
+    #         turn += 1
+    #         if turn  == 5: 
+    #             turn = 1
+    #     for event in pygame.event.get():
+    #         if event.type == pygame.QUIT:
+    #             running = False
+    #         elif event.type == pygame.KEYDOWN:
+    #             if event.key == pygame.K_SPACE :
+    #                 dice_number = dice.dice_roll(screen_board)
+    #                 flag  = True
+                    
+
     pygame.quit()
-    
-    
-    
-                   
+
+              
         
 
 
