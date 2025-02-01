@@ -1,7 +1,7 @@
 import pygame
 import dice
 import sounds
-
+import visuals
 
 
 # Colors
@@ -239,39 +239,68 @@ def move(screen, dice_number, turn, str_selected_colors ) :
             if player_pieces[current_color][piece] is not None:
                 move_piece(screen, current_color, piece, dice_number)
                 break
-            
-            
-            
-def main(screen,str_selected_colors):
-    
+ 
+ 
 
-    
+
+def draw_dynamic_circle(screen, current_color, selected_piece_index):
+    pieces = ["piece1", "piece2", "piece3", "piece4"]
+    if player_pieces[current_color][pieces[selected_piece_index]] is not None:
+        pos = road_map[current_color][player_pieces[current_color][pieces[selected_piece_index]]]
+        pygame.draw.circle(screen, BLACK, pos, 25, 2)
+
+def handle_piece_selection(screen, event, current_color, selected_piece_index, dice_number, flag):
+    pieces = ["piece1", "piece2", "piece3", "piece4"]
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_RIGHT:
+            # Only switch between pieces if there is more than one piece of the current color on the board
+            if sum(1 for piece in pieces if player_pieces[current_color][piece] is not None) > 1:
+                selected_piece_index = (selected_piece_index + 1) % 4
+        elif event.key == pygame.K_RETURN and flag:
+            move_piece(screen, current_color, pieces[selected_piece_index], dice_number)
+            flag = False
+    return selected_piece_index, flag
+
+def main(screen, str_selected_colors):
     running = True
-    
     turn = 1
     dice_number = 0
-    
+    pieces = ["piece1", "piece2", "piece3", "piece4"]
     flag = False
+    selected_piece_index = 0
 
-    while running :
-        if flag :
-            move(screen , dice_number, turn, str_selected_colors)
+    
+    while running:
+        current_color = str_selected_colors[turn-1]
+        if flag:
+            move(screen, dice_number, turn, str_selected_colors)
             flag = False
             turn += 1
-            if turn  == len(str_selected_colors ) +1: 
+            if turn == len(str_selected_colors) + 1:
                 turn = 1
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE :
+                if event.key == pygame.K_SPACE:
                     dice_number = dice.dice_roll(screen)
-                    flag  = True
-        
-        
-    
+                    flag = True
+                handle_piece_selection(screen, event, current_color, selected_piece_index, dice_number, flag)
+
+       
+
+        # Draw dynamic selection circle around the selected piece
+        draw_dynamic_circle(screen, current_color, selected_piece_index)
+
         pygame.display.flip()
-        
+          # Control the frame rate
 
     pygame.quit()
+
+       
+       
+    
+ 
+
 
