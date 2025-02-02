@@ -249,11 +249,11 @@ def display_winner_message(winner_color):
 
     # پیام تبریک به بازیکن برنده
     winner_text = FONT.render(f"Player {winner_color.capitalize()} Wins!", True, COLORS[winner_color])
-    WIN.blit(winner_text, (WIDTH // 2 - winner_text.get_width() // 2, HEIGHT // 2 - winner_text.get_height() // 2 - 600))
+    WIN.blit(winner_text, (WIDTH // 2 - winner_text.get_width() // 2, HEIGHT // 2 - winner_text.get_height() // 2 - 300))
 
     # پیام برای خروج از بازی
     continue_text = FONT.render("Press ESC to Exit", True, WHITE)
-    WIN.blit(continue_text, (WIDTH // 2 - continue_text.get_width() // 2, HEIGHT // 2 - 400))
+    WIN.blit(continue_text, (WIDTH // 2 - continue_text.get_width() // 2, HEIGHT // 2 - 100))
 
     pygame.display.update()
     
@@ -337,7 +337,7 @@ def main():
                     if not valid_pieces:
                         draw_board(players, current_player, dice_value)
                         pygame.display.update()
-                        #pygame.rime.delay(1500)
+                        pygame.time.delay(1500)
                         dice_value = None
                         current_player = (current_player + 1) % num_players
 
