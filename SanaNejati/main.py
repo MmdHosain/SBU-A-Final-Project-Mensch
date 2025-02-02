@@ -267,6 +267,12 @@ PLAYER_START_POSITIONS = {
     "blue": [(669, 67), (735, 67), (669, 133), (735, 133)],
 }
 
+#حدف خونه های شروع بقیه مهره ها از مسیر اصلی
+def remove_start_positions_from_path(path, own_color):
+    blocked_position = [
+        pos for color, positions in PLAYER_START_POSITIONS.items() if color != own_color for pos in positions
+    ]
+    return [pos for pos in path if pos not in blocked_position]
 # Define Base Path and Player Paths
 BASE_PATH = [
     (67, 334), (134, 334), (201, 334), (268, 334), (335, 334), 
@@ -289,10 +295,10 @@ PLAYER_FINISH_PATHS = {
 
 # Define Paths for Each Player
 PLAYER_PATHS = {
-    "red": BASE_PATH[:40] + PLAYER_FINISH_PATHS["red"],  
-    "yellow": BASE_PATH[30:] + BASE_PATH[:30] + PLAYER_FINISH_PATHS["yellow"],  
-    "green": BASE_PATH[20:] + BASE_PATH[:20] + PLAYER_FINISH_PATHS["green"],  
-    "blue": BASE_PATH[10:] + BASE_PATH[:10] + PLAYER_FINISH_PATHS["blue"],  
+    "red": remove_start_positions_from_path(BASE_PATH[:40], "red") + PLAYER_FINISH_PATHS["red"],  
+    "yellow": remove_start_positions_from_path(BASE_PATH[30:] + BASE_PATH[:30], "yellow") + PLAYER_FINISH_PATHS["yellow"],  
+    "green": remove_start_positions_from_path(BASE_PATH[20:] + BASE_PATH[:20], "green") + PLAYER_FINISH_PATHS["green"],  
+    "blue": remove_start_positions_from_path(BASE_PATH[10:] + BASE_PATH[:10], "blue") + PLAYER_FINISH_PATHS["blue"],  
 }
 
 
