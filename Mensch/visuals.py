@@ -154,7 +154,7 @@ def start_end(screen_board):
  
 
     
-def board(click_volume , music_volume, selected_colors):
+def board( selected_colors):
     # print(type(selected_colors[0]))
     str_selected_colors = []
     colors = ["red", "green", "yellow", "blue"]
