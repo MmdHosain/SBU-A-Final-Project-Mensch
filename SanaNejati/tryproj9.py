@@ -318,7 +318,15 @@ def get_valid_pieces(player, dice_value, players):
 def main():
     menu()
     num_players = player_selection()  # انتخاب تعداد بازیکنان
+    
+    if not isinstance(num_players, int):
+        return
+    
     player_colors_list = color_selection(num_players)  # انتخاب رنگ بازیکنان
+    
+    if not player_colors_list:
+        return
+    
     players = [Player(color) for color in player_colors_list]
 
     clock = pygame.time.Clock()
