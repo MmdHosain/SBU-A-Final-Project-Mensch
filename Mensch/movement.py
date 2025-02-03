@@ -2,7 +2,7 @@ import pygame
 import dice
 import sounds
 import visuals
-
+import attack as att
 
 # Colors
 WHITE = (255, 255, 255)
@@ -105,6 +105,25 @@ blue_counter = -1
 yellow_counter= -1
 
 
+
+
+# Define multiple base positions for each color
+base_positions = {
+    "red": [(50, 50), (100, 50), (50, 100), (100, 100)],
+    "blue": [(550, 50), (600, 50), (550, 100), (600, 100)],
+    "green": [(50, 550), (100, 550), (50, 600), (100, 600)],
+    "yellow": [(550, 550), (600, 550), (550, 600), (600, 600)]
+}
+
+def get_base_position(color, board):
+    for pos in base_positions[color]:
+        if not any(piece_info['position'] == pos for pieces in board.values() for piece_info in pieces.values()):
+            return pos
+    return None  # In case all base positions are occupied
+
+
+
+
 def draw_pieces(screen, positions, color):
     
     for pos in positions:
@@ -176,23 +195,32 @@ def move_piece(screen, color, piece, dice_number):
         
         
         player_pieces[color][piece] += dice_number
+       # Ensure the piece's position is within the bounds of the road map
         if player_pieces[color][piece] >= len(road_map[color]):
-            pass
-        else :
+            player_pieces[color][piece] = len(road_map[color]) - 1
+
+# Call the attack function after moving the piece
+        attacking_piece = {
+            'color': color,
+            'position': player_pieces[color][piece]
+            }
+        att.attack(player_pieces, attacking_piece)
+
         
-            for piece in player_pieces["red"]:
-                if player_pieces["red"][piece] is not None:
-                    draw_pieces(screen, [road_map["red"][player_pieces["red"][piece]]], RED)
-            for piece in player_pieces["blue"]:
-                if player_pieces["blue"][piece] is not None:
-                    draw_pieces(screen, [road_map["blue"][player_pieces["blue"][piece]]], BLUE)
-            for piece in player_pieces["green"]:
-                if player_pieces["green"][piece] is not None:
-                    draw_pieces(screen, [road_map["green"][player_pieces["green"][piece]]], GREEN)
-            for piece in player_pieces["yellow"]:
-                if player_pieces["yellow"][piece] is not None:
-                    draw_pieces(screen, [road_map["yellow"][player_pieces["yellow"][piece]]], YELLOW)
-            pygame.display.flip()
+        
+        for piece in player_pieces["red"]:
+            if player_pieces["red"][piece] is not None:
+                draw_pieces(screen, [road_map["red"][player_pieces["red"][piece]]], RED)
+        for piece in player_pieces["blue"]:
+            if player_pieces["blue"][piece] is not None:
+                draw_pieces(screen, [road_map["blue"][player_pieces["blue"][piece]]], BLUE)
+        for piece in player_pieces["green"]:
+            if player_pieces["green"][piece] is not None:
+                draw_pieces(screen, [road_map["green"][player_pieces["green"][piece]]], GREEN)
+        for piece in player_pieces["yellow"]:
+            if player_pieces["yellow"][piece] is not None:
+                draw_pieces(screen, [road_map["yellow"][player_pieces["yellow"][piece]]], YELLOW)
+        pygame.display.flip()
         
         
         
@@ -252,18 +280,18 @@ def move(screen, dice_number, turn, str_selected_colors) :
     
  
  
-def handle_piece_selection_with_keys(event, current_color, selected_piece_index):
+def handle_piece_selection_with_keys(screen, event, color, selected_piece_index, dice_number):
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_1:
-            selected_piece_index = 0
+            move_piece(screen, color, "piece1", dice_number)
         elif event.key == pygame.K_2:
-            selected_piece_index = 1
+            move_piece(screen, color, "piece2", dice_number)
         elif event.key == pygame.K_3:
-            selected_piece_index = 2
+            move_piece(screen, color, 'piece3', dice_number)
         elif event.key == pygame.K_4:
-            selected_piece_index = 3
-    print(selected_piece_index)
-    return selected_piece_index
+            move_piece(screen, color, 'piece4', dice_number)
+    
+    
  
 
 def main(screen, str_selected_colors):
@@ -279,6 +307,7 @@ def main(screen, str_selected_colors):
         
         current_color = str_selected_colors[turn-1]
         if flag:
+            
             move(screen, dice_number, turn, str_selected_colors)
             flag = False
             turn += 1
@@ -289,25 +318,29 @@ def main(screen, str_selected_colors):
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
+                
                 font = pygame.font.Font(None, 26)
                 upper_current_color = current_color.upper()
                 text_surface = font.render((f"   {upper_current_color}'s Turn   "), True, BLACK)
                 text_rect = text_surface.get_rect(center=(300, 20))
-                screen.fill(BIEGE, text_rect)
                 
+                screen.fill(BIEGE, text_rect)
                 if event.key == pygame.K_SPACE:
+                    
+                    screen.blit(text_surface, text_rect)
+                    
+                    
                     dice_number = dice.dice_roll(screen)
                     flag = True
                 
                 # Handle piece selection with number keys
-                selected_piece_index = handle_piece_selection_with_keys(event, current_color, selected_piece_index)
+                
+                handle_piece_selection_with_keys(screen, event, current_color, selected_piece_index, dice_number)
                 
                 # Move the selected piece if Enter key is pressed
-                if event.key == pygame.K_RETURN and flag:
-                    pieces = ["piece1", "piece2", "piece3", "piece4"]
-                    move_piece(screen, current_color, pieces[selected_piece_index], dice_number)
-                    flag = False
-                
+                # if event.key == pygame.K_RETURN and flag:
+                #     move_piece(screen, current_color, pieces[selected_piece_index], dice_number)
+                #     flag = False
                 pygame.display.update()
 
         pygame.display.flip()
@@ -315,10 +348,3 @@ def main(screen, str_selected_colors):
     
          
     pygame.quit()
-
-       
-       
-    
- 
-
-

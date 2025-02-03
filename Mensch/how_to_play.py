@@ -51,6 +51,7 @@ def how_to_play(WIDTH, click_volume, music_volume ):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+                
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     
