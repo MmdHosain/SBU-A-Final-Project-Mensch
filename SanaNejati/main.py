@@ -193,46 +193,47 @@ class Player:
             pygame.draw.circle(WIN, COLORS[self.color], pos, 25)
 
     def move(self, piece_index, steps, players):
-        """ Move a piece along the path, handling captures and finishing paths """
         path = PLAYER_PATHS[self.color]
 
-        if self.path_index[piece_index] == -1:  # if piece is in home
-            if steps == 6:  # Can only move out on a 6
+        if self.path_index[piece_index] == -1:  # اگر مهره هنوز در خانه شروع باشد
+            if steps == 6:  # فقط با تاس 6 می‌تواند وارد مسیر شود
                 self.path_index[piece_index] = 0
                 self.pieces[piece_index] = path[0]
         else:
             new_index = self.path_index[piece_index] + steps
 
             if new_index >= len(path):
-                return
-            # بررسی اشغال بودن خانه های رنگی
-            target_position = path[new_index]
-            for color, start_positions in PLAYER_START_POSITIONS.items():
-                if color != self.color and target_position in start_positions:
-                    return
+                return  # اگر حرکت بیش از حد مجاز باشد، حرکت انجام نمی‌شود
 
+            target_position = path[new_index]
+
+        # بررسی خانه‌های رنگی (مسیر پایانی)
             if target_position in PLAYER_FINISH_PATHS[self.color]:
+            # اگر خانه رنگی اشغال شده باشد، حرکت غیرمجاز است
                 for player in players:
                     if target_position in player.pieces:
-                        return
+                        return  # مهره نمی‌تواند حرکت کند
             else:
+            # بررسی گرفتن مهره‌های حریف فقط در مسیر اصلی
                 for player in players:
                     if player.color != self.color:
                         for i, piece in enumerate(player.pieces):
                             if piece == target_position:
+                            # مهره حریف به خانه ابتدایی برگردانده می‌شود
                                 player.pieces[i] = PLAYER_START_POSITIONS[player.color][i]
                                 player.path_index[i] = -1
-                    
-            self.path_index[piece_index] = new_index
-            self.pieces[piece_index] = target_position
 
-            if new_index < len(BASE_PATH):
-                for player in players:
-                    if player.color != self.color:
-                        for i, piece in enumerate(player.pieces):
-                            if piece == self.pieces[piece_index]:
-                                player.pieces[i] = PLAYER_START_POSITIONS[player.color][i]
-                                player.path_index[i] = -1
+        # انجام حرکت نهایی
+                self.path_index[piece_index] = new_index
+                self.pieces[piece_index] = target_position
+
+                if new_index < len(BASE_PATH):
+                    for player in players:
+                        if player.color != self.color:
+                            for i, piece in enumerate(player.pieces):
+                                if piece == self.pieces[piece_index]:
+                                    player.pieces[i] = PLAYER_START_POSITIONS[player.color][i]
+                                    player.path_index[i] = -1
 
             #Check for captures
             for player in players:
@@ -329,14 +330,10 @@ def main():
                             players[current_player].path_index[i] + dice_value < len(PLAYER_PATHS[players[current_player].color]) and
                             (
                                 PLAYER_PATHS[players[current_player].color][players[current_player].path_index[i] + dice_value] not in [
-                                    pos for color, positions in PLAYER_START_POSITIONS.items() if color != players[current_player].color for pos in positions
-                                ] and
-                                (
-                                    PLAYER_PATHS[players[current_player].color][players[current_player].path_index[i] + dice_value] not in [
-                                        pos for player in players for pos in player.pieces
-                                    ] if PLAYER_PATHS[players[current_player].color][players[current_player].path_index[i] + dice_value] in PLAYER_FINISH_PATHS[players[current_player].color]
-                                    else True
-                                )
+                                    pos for player in players for pos in player.pieces
+                                ]
+                                if PLAYER_PATHS[players[current_player].color][players[current_player].path_index[i] + dice_value] in PLAYER_FINISH_PATHS[players[current_player].color]
+                                else True
                             )
                         )
                     ]
