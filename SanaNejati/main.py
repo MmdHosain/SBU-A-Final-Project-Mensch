@@ -345,7 +345,7 @@ def main():
                     if not valid_pieces:
                         draw_board(players, current_player, dice_value)
                         pygame.display.update()
-                        pygame.time.delay(2000)
+                        pygame.time.delay(1700)
                         dice_value = None
                         current_player = (current_player + 1) % num_players
 
