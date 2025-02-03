@@ -1,5 +1,6 @@
 import pygame
 import random
+import os
 
 # Constants
 SCREEN_WIDTH = 800
@@ -175,6 +176,46 @@ PLAYER_PATHS = {
 }
 
 
+# Function to load meme images
+def load_meme_images():
+    meme_folder = "meme"
+    meme_images = []
+
+    # Get a list of all files in the meme folder
+    for filename in os.listdir(meme_folder):
+        if filename.endswith(
+            (".png", ".jpg", ".jpeg", ".webp")
+        ):  # Check for image files
+            image_path = os.path.join(meme_folder, filename)
+            meme_images.append(pygame.image.load(image_path))
+
+    return meme_images
+
+
+# Function to show a meme image
+def show_meme_image(WIN, meme_image):
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:  # Press ESC to return to menu
+                    running = False
+
+        WIN.fill((0, 0, 0))  # Black background
+        WIN.blit(
+            meme_image,
+            (
+                SCREEN_WIDTH // 2 - meme_image.get_width() // 2,
+                SCREEN_HEIGHT // 2 - meme_image.get_height() // 2,
+            ),
+        )
+        pygame.display.update()
+
+    pygame.quit()
+
+
 # Player Class
 class Player:
     def __init__(self, color):
@@ -243,8 +284,11 @@ def main():
     WIN = init_game()
     bg_image = load_background_image()
     clock = pygame.time.Clock()
-    running = True
 
+    # Load meme images
+    meme_images = load_meme_images()
+
+    running = True
     selected_option = 0
     while running:
         for event in pygame.event.get():
@@ -262,36 +306,15 @@ def main():
                         show_how_to_play()
                     elif selected_option == 2:  # Quit
                         running = False
+                    elif selected_option == 3:  # I'm Feeling Lucky
+                        # Show a random meme image
+                        random_meme = random.choice(meme_images)
+                        show_meme_image(WIN, random_meme)
 
         draw_menu(WIN, selected_option)
         clock.tick(FPS)
 
     pygame.quit()
-
-
-# Function to select number of players
-def select_number_of_players(WIN):
-    selected_option = 0
-    running = True
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    selected_option = (selected_option - 1) % len(PLAYER_OPTIONS)
-                elif event.key == pygame.K_DOWN:
-                    selected_option = (selected_option + 1) % len(PLAYER_OPTIONS)
-                elif event.key == pygame.K_RETURN:
-                    if selected_option < 3:  # If selected 2, 3, or 4 players
-                        start_game(
-                            selected_option + 2, WIN
-                        )  # Convert to actual number of players
-                    elif selected_option == 3:  # Back to Menu
-                        running = False
-
-        draw_player_selection(WIN, selected_option)
-        pygame.time.Clock().tick(FPS)
 
 
 def show_winner_screen(winner_color):
