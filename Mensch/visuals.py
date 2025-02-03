@@ -154,17 +154,17 @@ def start_end(screen_board):
  
 
     
-def board( selected_colors):
+def board( selected_colors, click_volume, music_volume):
     # print(type(selected_colors[0]))
     str_selected_colors = []
-    colors = ["red", "green", "yellow", "blue"]
+    colors = ["red", "green", "blue", "yellow"]
     for item  in selected_colors :
         tmp = colors[item]
         
         str_selected_colors.append(tmp)
     
-    first_player = random.choice(str_selected_colors)
-    print(first_player)
+    
+   
     # Initialize Pygame
     pygame.init()
 
@@ -182,40 +182,42 @@ def board( selected_colors):
     start_end(screen_board)
     
     pygame.display.flip()
-    move.main(screen_board, str_selected_colors)
+    confirm_exit = False
+    running = True
     # while running: 
         
-        # for event in pygame.event.get():
-        #     if event.type == pygame.QUIT:
-        #         running = False
-            # elif event.type == pygame.KEYDOWN:
-            #     if event.key == pygame.K_ESCAPE:
-            #         confirm_exit = True
-            #     elif confirm_exit:
-            #         if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-            #             selected_option = (selected_option + 1) % 2
-            #         elif event.key == pygame.K_RETURN:
-            #             if selected_option == 0:  # Yes
-            #                 running = False
-            #                 WIDTH, HEIGHT = 300, 400
-            #                 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-            #                 fir.Lobby(screen, WIDTH, HEIGHT,click_volume, music_volume )
-            #                 return
-            #             elif selected_option == 1:  # No
-            #                 confirm_exit = False
-            #     else:
-            #         dice_loc( screen_board)
+    #     for event in pygame.event.get():
+    #         if event.type == pygame.QUIT:
+    #             running = False
+    #         elif event.type == pygame.KEYDOWN:
+    #             if event.key == pygame.K_ESCAPE:
+    #                 confirm_exit = True
+    #             elif confirm_exit:
+    #                 if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+    #                     selected_option = (selected_option + 1) % 2
+    #                 elif event.key == pygame.K_RETURN:
+    #                     if selected_option == 0:  # Yes
+    #                         running = False
+    #                         WIDTH, HEIGHT = 300, 400
+    #                         screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    #                         fir.Lobby(screen, WIDTH, HEIGHT,click_volume, music_volume) 
+    #                         return
+    #                     elif selected_option == 1:  # No
+    #                         confirm_exit = False
+    #             else:
+    #                 dice.dice_roll( screen_board)
 
         
 
-        # if confirm_exit:
-        #     # Draw confirmation box
-        #     result = con.confirm(screen_board, selected_option,click_volume,music_volume)
-        #     if result is False:
-        #         confirm_exit = False
-        #     elif result is True:
-        #         running = False
+    #     if confirm_exit:
+    #         # Draw confirmation box
+    #         result = con.confirm(screen_board, selected_option,click_volume,music_volume)
+    #         if result is False:
+    #             confirm_exit = False
+    #         elif result is True:
+    #             running = False
         
+    move.main(screen_board, str_selected_colors)
 
 
     pygame.quit()

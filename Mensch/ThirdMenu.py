@@ -85,8 +85,9 @@ def color_selecting(players_count, bot_count, total, screen, WIDTH, HEIGHT,click
                         selected_option = len(colors) + (selected_option - len(colors) + 1) % 2
                     elif event.key == pygame.K_RETURN:
                         if selected_option == len(colors):
+                            print(selected_colors)
                             sounds.menu_click_sound_effect(click_volume)
-                            visuals.board( selected_colors) ##########
+                            visuals.board( selected_colors, click_volume, music_volume) ##########
                             return selected_colors
                         elif selected_option == len(colors) + 1:
                             selecting_colors = True
