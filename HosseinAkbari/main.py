@@ -9,14 +9,14 @@ BG_COLOR = (128, 128, 128)
 BG_IMAGE_PATH = "bg.jpg"
 
 # Menu options
-MENU_OPTIONS = ["New Game", "How to Play", "Quit"]
+MENU_OPTIONS = ["New Game", "How to Play", "Quit", "I'm Feeling Lucky"]
 PLAYER_OPTIONS = ["2 Players", "3 Players", "4 Players", "Back to Menu"]
 FONT_SIZE = 40
 
 
 # Initialize Pygame
 def init_game():
-    pygame.init()
+    pygame.init()  # Initialize pygame
     pygame.font.init()  # Initialize the font module
     WIN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Mensch by Hossein Akbari")
@@ -83,6 +83,36 @@ PLAYER_START_POSITIONS = {
     "green": [(669, 667), (735, 667), (670, 735), (735, 735)],
     "blue": [(669, 67), (735, 67), (669, 133), (735, 133)],
 }
+
+
+def select_piece_to_move(WIN, player, dice_value):
+    selected_piece = 0
+    running = True
+    while running:
+        WIN.fill((0, 0, 0))  # Black background
+        font = pygame.font.Font(None, 36)
+        text = font.render(f"Dice roll:{dice_value} ", True, (255, 255, 255))
+        WIN.blit(text, (400, 400))
+        # Draw player's pieces
+        for i, pos in enumerate(player.pieces):
+            color = (255, 255, 255) if selected_piece == i else (200, 200, 200)
+            pygame.draw.circle(WIN, color, pos, 25)
+            text = font.render(f"{i + 1}", True, (255, 255, 255))
+            WIN.blit(text, (pos[0] - 10, pos[1] + 30))
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected_piece = (selected_piece - 1) % 4  # Assuming 4 pieces
+                elif event.key == pygame.K_DOWN:
+                    selected_piece = (selected_piece + 1) % 4
+                elif event.key == pygame.K_SPACE:
+                    return selected_piece  # Return the index of the selected piece
+
 
 # Define Base Path
 BASE_PATH = [
@@ -264,17 +294,41 @@ def select_number_of_players(WIN):
         pygame.time.Clock().tick(FPS)
 
 
+def show_winner_screen(winner_color):
+    WIN = init_game()  # Initialize a new window for the winner screen
+    font = pygame.font.Font(None, 74)
+    message = f".:{winner_color.capitalize()} WINS!:."
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:  # Press ESC to quit
+                    running = False
+                elif event.key == pygame.K_RETURN:  # Press Enter to return to menu
+                    running = False
+
+        # Fill the background
+        WIN.fill((0, 0, 0))  # Black background
+        # Render the winning message
+        text = font.render(message, True, (255, 255, 255))  # White text
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+        WIN.blit(text, text_rect)
+
+        pygame.display.update()
+
+
 # Start the game with the selected number of players
 def start_game(num_players, WIN):
     print(f"Starting a new game with {num_players} players...")
 
-    # Load board image
     global BOARD_IMAGE
     BOARD_IMAGE = pygame.transform.scale(
         pygame.image.load("bg.jpg"), (SCREEN_WIDTH, SCREEN_HEIGHT)
     )
 
-    # Create players
     players = [Player("red"), Player("yellow"), Player("green"), Player("blue")][
         :num_players
     ]
@@ -295,18 +349,21 @@ def start_game(num_players, WIN):
                     print(
                         f"Player {players[current_player].color} rolled a {dice_value}"
                     )
+                    draw_board(WIN, players, current_player, dice_value)
 
-                    for i in range(4):
-                        if players[current_player].path_index[i] == -1 or players[
-                            current_player
-                        ].path_index[i] + dice_value < len(
-                            PLAYER_PATHS[players[current_player].color]
-                        ):
-                            players[current_player].move(i, dice_value, players)
-                            break
+                    # Select a piece to move
+                    piece_index = select_piece_to_move(
+                        WIN, players[current_player], dice_value
+                    )
+
+                    # Move the selected piece
+                    players[current_player].move(piece_index, dice_value, players)
 
                     if players[current_player].check_win():
                         print(f"🎉 {players[current_player].color} WINS!")
+                        show_winner_screen(
+                            players[current_player].color
+                        )  # Show winner screen
                         running = False
 
                     if dice_value != 6:
