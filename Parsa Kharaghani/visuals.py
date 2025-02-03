@@ -217,7 +217,7 @@ def board( selected_colors, click_volume, music_volume):
     #         elif result is True:
     #             running = False
         
-    move.main(screen_board, str_selected_colors)
+    move.main(screen_board, str_selected_colors, click_volume, music_volume)
 
 
     pygame.quit()

@@ -2,8 +2,8 @@ import pygame
 import dice
 import sounds
 import visuals
-
-
+import FirstMenu as fir
+import confirmation as conf
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -40,7 +40,7 @@ all_cordinates = ((40, 250), (90, 250), (140, 250), (190, 250), (240, 250),
 
 
 road_map = {
-"red" : ((40, 250), (90, 250), (140, 250), (190, 250), (240, 250), 
+"red" :[(40, 250), (90, 250), (140, 250), (190, 250), (240, 250), 
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50),
               (360, 100), (360, 150), (360, 200), (360, 250), 
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
@@ -48,9 +48,9 @@ road_map = {
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
                (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
-              (90, 300), (140, 300), (190, 300), (240, 300)),
+              (90, 300), (140, 300), (190, 300), (240, 300)],
 
-"green" : ((360, 50), (360, 100), (360, 150), (360, 200), (360, 250), 
+"green" : [(360, 50), (360, 100), (360, 150), (360, 200), (360, 250), 
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
                (510, 350), (460, 350), (410, 350), (360, 350), 
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
@@ -58,9 +58,9 @@ road_map = {
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
               (90, 250), (140, 250), (190, 250), (240, 250), 
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50), 
-              (300, 100), (300, 150), (300, 200), (300, 250)),
+              (300, 100), (300, 150), (300, 200), (300, 250)],
 
-"yellow" : ((560, 350), (510, 350), (460, 350), (410, 350), (360, 350), 
+"yellow" : [(560, 350), (510, 350), (460, 350), (410, 350), (360, 350), 
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
                (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
@@ -68,9 +68,9 @@ road_map = {
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50),
                (360, 100), (360, 150), (360, 200), (360, 250), 
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
-              (510,300), (460, 300), (410,300), (360, 300)),
+              (510,300), (460, 300), (410,300), (360, 300)],
 
-"blue" : ((240, 550), (240, 500), (240, 450), (240, 400), (240, 350), 
+"blue" : [(240, 550), (240, 500), (240, 450), (240, 400), (240, 350), 
               (190, 350), (140, 350), (90, 350), (40, 350), (40, 300),
                (90, 250), (140, 250), (190, 250), (240, 250), 
               (240, 200), (240, 150), (240, 100), (240, 50), (300, 50),
@@ -78,7 +78,7 @@ road_map = {
               (410, 250), (460, 250), (510, 250), (560, 250), (560, 300), 
                (510, 350), (460, 350), (410, 350), (360, 350), 
               (360, 400), (360, 450), (360, 500), (360, 550), (300, 550), 
-              (300, 500), (300, 450), (300, 400), (300, 350))
+              (300, 500), (300, 450), (300, 400), (300, 350)]
 }
 
 starting_sections = {
@@ -198,28 +198,28 @@ def ask_to_add_piece(screen, color):
                 if event.key == pygame.K_y:
                     response = True
                     waiting_for_response = False
-                    
+                else :
 
-            None_counter = 0
-            for piece in player_pieces[color]:
-                
-                if player_pieces[color][piece]  == None:
-                    None_counter += 1
-              
-            if None_counter == 4:
-                pass
-                
-            elif None_counter <= 3:
-               
-                
-                while waiting_for_response:
-                    piece_on_board_ls = []
-                    for pieces , keys in player_pieces[color].items():
-                        if keys is not None:
-                            piece_on_board_ls.append(pieces)
-                    waiting_for_response , selected_piece = ask_move_piece(screen, color, piece, 6 , piece_on_board_ls)
+                    None_counter = 0
+                    for piece in player_pieces[color]:
+                        
+                        if player_pieces[color][piece]  == None:
+                            None_counter += 1
                     
-                    move_piece(screen, color, selected_piece, 6)
+                    if None_counter == 4:
+                        pass
+                        
+                    elif None_counter <= 3:
+                    
+                        
+                        while waiting_for_response:
+                            piece_on_board_ls = []
+                            for pieces , keys in player_pieces[color].items():
+                                if keys is not None:
+                                    piece_on_board_ls.append(pieces)
+                            waiting_for_response , selected_piece = ask_move_piece(screen, color, piece, 6 , piece_on_board_ls)
+                            
+                            move_piece(screen, color, selected_piece, 6)
 
 
 
@@ -244,7 +244,7 @@ def attack_check(color, new_loc,screen):
         Current_color = YELLOW
         
     new_cordinate = road_map[color][new_loc]
-    print(new_cordinate)
+    
     print(updated_info)
     print(player_pieces)
     colors_ls =  ["red", "green", "blue", "yellow"]
@@ -314,7 +314,10 @@ def move_piece(screen, color, piece, dice_number):
             elif color == "yellow" :
                 pygame.draw.circle(screen, LIGHT_YELLOW ,road_map[color][player_pieces[color][piece]], 20)
         else :
-            pygame.draw.circle(screen, WHITE ,road_map[color][player_pieces[color][piece]], 20)
+            if player_pieces[color][piece] < 37 :
+                pygame.draw.circle(screen, WHITE ,road_map[color][player_pieces[color][piece]], 20)
+            else : pass
+            
         
         
         player_pieces[color][piece] += dice_number
@@ -324,49 +327,55 @@ def move_piece(screen, color, piece, dice_number):
                 
        # Ensure the piece's position is within the bounds of the road map
         if player_pieces[color][piece] >= len(road_map[color]):
-            player_pieces[color][piece] = len(road_map[color]) - 1
+            player_pieces[color][piece] -= dice_number
                 
 
 
+    try :
+        if player_pieces[color][piece] is not None :
+            if   player_pieces[color][piece] < 37 :
+                if player_pieces["red"][piece] is not None:
+                
+                
+                    updated_info["red"][piece]=[road_map["red"][player_pieces["red"][piece]]]
+                
+                
+                
+            
+                    draw_pieces(screen, [road_map["red"][player_pieces["red"][piece]]], RED)
+            
+                if player_pieces["blue"][piece] is not None:
+                    
+                    updated_info["blue"][piece] = [road_map["blue"][player_pieces["blue"][piece]]]
+                    
+                    
+                    
+                    draw_pieces(screen, [road_map["blue"][player_pieces["blue"][piece]]], BLUE)
+            
+                if player_pieces["green"][piece] is not None:
+                    
+                    updated_info["green"][piece] = [road_map["green"][player_pieces["green"][piece]]]
+                    
+                    
+                    
+                    draw_pieces(screen, [road_map["green"][player_pieces["green"][piece]]], GREEN)
+            
+                if player_pieces["yellow"][piece] is not None:
+                    
+                    updated_info["yellow"][piece] = [road_map["yellow"][player_pieces["yellow"][piece]]]
+                    
+                    
+                    
+                    draw_pieces(screen, [road_map["yellow"][player_pieces["yellow"][piece]]], YELLOW)
+                
+                
+                attack_check(color, player_pieces[color][piece], screen)
+            else : pass
+            pygame.display.flip()
+    except IndexError :
+        pass
         
-        
-        if player_pieces["red"][piece] is not None:
             
-            updated_info["red"][piece]=[road_map["red"][player_pieces["red"][piece]]]
-            
-            
-            
-            draw_pieces(screen, [road_map["red"][player_pieces["red"][piece]]], RED)
-    
-        if player_pieces["blue"][piece] is not None:
-            
-            updated_info["blue"][piece] = [road_map["blue"][player_pieces["blue"][piece]]]
-            
-            
-            
-            draw_pieces(screen, [road_map["blue"][player_pieces["blue"][piece]]], BLUE)
-    
-        if player_pieces["green"][piece] is not None:
-            
-            updated_info["green"][piece] = [road_map["green"][player_pieces["green"][piece]]]
-            
-            
-            
-            draw_pieces(screen, [road_map["green"][player_pieces["green"][piece]]], GREEN)
-    
-        if player_pieces["yellow"][piece] is not None:
-            
-            updated_info["yellow"][piece] = [road_map["yellow"][player_pieces["yellow"][piece]]]
-            
-            
-            
-            draw_pieces(screen, [road_map["yellow"][player_pieces["yellow"][piece]]], YELLOW)
-        
-        
-        attack_check(color, player_pieces[color][piece], screen)
-    pygame.display.flip()
-        
-        
         
 def move(screen, dice_number, turn, str_selected_colors) :
     
@@ -470,7 +479,7 @@ def handle_piece_selection_with_keys(screen, event, color, selected_piece_index,
     
  
 
-def main(screen, str_selected_colors):
+def main(screen, str_selected_colors, click_volume , music_volume):
     running = True
     turn = 1
     dice_number = 0
@@ -480,9 +489,37 @@ def main(screen, str_selected_colors):
 
     
     while running:
+       
+            
+                    
         
+        
+        
+        
+                    
+                    
         
         current_color = str_selected_colors[turn-1]
+        for pieces , index in player_pieces[current_color].items() :
+            print(f"{current_color} : {index}")
+            print(len(road_map[current_color]) - 1)
+            if index == len(road_map[current_color]) - 1 :
+                road_map[current_color].pop()
+                print(len(road_map[current_color]))
+                
+        if len(road_map[current_color]) == 37 :
+            screen.fill(BIEGE)
+            font = pygame.font.Font(None, 80)
+            text_surface = font.render(f"{current_color} Win", True, BLACK)
+            text_rect = text_surface.get_rect(center=(300, 300))
+            screen.blit(text_surface, text_rect)
+        elif event.type == pygame.KEYDOWN:
+                
+                if event.key == pygame.K_ESCAPE:
+                    WIDTH, HEIGHT = 300, 400
+                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                    fir.Lobby(screen, WIDTH, HEIGHT, click_volume, music_volume)
+        
         if flag:
             if dice_number == 6 :
                 move(screen, dice_number, turn, str_selected_colors)
@@ -500,6 +537,11 @@ def main(screen, str_selected_colors):
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
+                
+                if event.key == pygame.K_ESCAPE:
+                    WIDTH, HEIGHT = 300, 400
+                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+                    fir.Lobby(screen, WIDTH, HEIGHT, click_volume, music_volume)
                 
                 font = pygame.font.Font(None, 26)
                 upper_current_color = current_color.upper()
