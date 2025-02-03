@@ -314,12 +314,6 @@ def get_valid_pieces(player, dice_value, players):
                     valid_pieces.append(i)
     return valid_pieces
 
-def is_start_position(position):
-    for color, positions in PLAYER_START_POSITIONS.items():
-        if position in positions:
-            return True
-    return False
-
 # Main Game Loop
 def main():
     menu()
@@ -346,34 +340,18 @@ def main():
                     print(f"Player {players[current_player].color} rolled a {dice_value}")
                     
                     # بررسی مهره های قابل حرکت
-                    valid_pieces = [
-                        i for i in range(4)
-                        if (
-                            (players[current_player].path_index[i] == -1 and dice_value == 6)  # ورود به بازی با تاس 6
-                            or
-                            (players[current_player].path_index[i] != -1 and  # مهره در مسیر بازی باشد
-                             players[current_player].path_index[i] + dice_value < len(PLAYER_PATHS[players[current_player].color]) and
-                             not is_start_position(PLAYER_PATHS[players[current_player].color][players[current_player].path_index[i] + dice_value]) and
-                             (
-                                 PLAYER_PATHS[players[current_player].color][players[current_player].path_index[i] + dice_value] not in [
-                                     pos for player in players for pos in player.pieces
-                                 ]
-                                 if PLAYER_PATHS[players[current_player].color][players[current_player].path_index[i] + dice_value] in PLAYER_FINISH_PATHS[players[current_player].color]
-                                 else True
-                             ))
-                        )
-                    ]
+                    valid_pieces = get_valid_pieces(players[current_player], dice_value, players)
 
                     if not valid_pieces:
                         draw_board(players, current_player, dice_value)
                         pygame.display.update()
-                        pygame.time.delay(1800)
+                        pygame.time.delay(1700)
                         dice_value = None
                         current_player = (current_player + 1) % num_players
 
                 elif event.key in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4]:
                     index = event.key - pygame.K_1
-                    if index in valid_pieces:
+                    if dice_value is not None and index in get_valid_pieces(players[current_player], dice_value, players):
                         selected_piece = index
 
                 elif event.key == pygame.K_RETURN and selected_piece is not None:
