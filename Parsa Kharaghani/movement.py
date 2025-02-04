@@ -4,6 +4,9 @@ import sounds
 import visuals
 import FirstMenu as fir
 import confirmation as conf
+import os
+
+
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -99,10 +102,10 @@ player_pieces = {
     "yellow": {"piece1": None, "piece2": None, "piece3": None, "piece4": None}
 }
 
-red_counter = -1
-green_counter = -1
-blue_counter = -1
-yellow_counter= -1
+red_counter = 0
+green_counter = 0
+blue_counter = 0
+yellow_counter= 0
 
 
 
@@ -220,6 +223,7 @@ def ask_to_add_piece(screen, color):
                             waiting_for_response , selected_piece = ask_move_piece(screen, color, piece, 6 , piece_on_board_ls)
                             
                             move_piece(screen, color, selected_piece, 6)
+                            
 
 
 
@@ -447,6 +451,12 @@ def move(screen, dice_number, turn, str_selected_colors) :
                 waiting_for_response , selected_piece = ask_move_piece(screen, current_color, piece, dice_number, piece_on_board_ls)
                 
                 move_piece(screen, current_color, selected_piece, dice_number)
+                base_path = os.path.dirname(__file__)
+                image_path = os.path.join(base_path, f"dice-images/ROLL.png")
+                img = pygame.image.load(image_path).convert()
+                new_size = (50, 50)  # New size (width, height)
+                img = pygame.transform.scale(img, new_size)
+                screen.blit(img, (275, 275))
             
                 
         
@@ -490,15 +500,6 @@ def main(screen, str_selected_colors, click_volume , music_volume):
     
     while running:
        
-            
-                    
-        
-        
-        
-        
-                    
-                    
-        
         current_color = str_selected_colors[turn-1]
         for pieces , index in player_pieces[current_color].items() :
             print(f"{current_color} : {index}")
@@ -513,12 +514,13 @@ def main(screen, str_selected_colors, click_volume , music_volume):
             text_surface = font.render(f"{current_color} Win", True, BLACK)
             text_rect = text_surface.get_rect(center=(300, 300))
             screen.blit(text_surface, text_rect)
-        elif event.type == pygame.KEYDOWN:
+        # for event in pygame.event.get():
+        #     if event.type == pygame.KEYDOWN:
                 
-                if event.key == pygame.K_ESCAPE:
-                    WIDTH, HEIGHT = 300, 400
-                    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-                    fir.Lobby(screen, WIDTH, HEIGHT, click_volume, music_volume)
+        #         if event.key == pygame.K_ESCAPE:
+        #             WIDTH, HEIGHT = 300, 400
+        #             screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        #             fir.Lobby(screen, WIDTH, HEIGHT, click_volume, music_volume)
         
         if flag:
             if dice_number == 6 :

@@ -17,6 +17,7 @@ click_volume , music_volume = 0.5 , 0.5
 sounds.bg_music(music_status,music_volume)
 
 
+
 # Call the Lobby function from FirstMenu
 
 fir.Lobby(screen, WIDTH, HEIGHT,click_volume , music_volume )
