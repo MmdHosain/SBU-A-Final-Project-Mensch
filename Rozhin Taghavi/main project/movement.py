@@ -50,14 +50,7 @@ def move_piece(dx, dy, player_positions, selected_piece_index, current_player_in
     # به‌روزرسانی مکان مهره
     player_positions[current_color][selected_piece_index] = new_position
 
-    # چک کردن برنده شدن پس از هر حرکت
-    # winner = check_winner(player_positions, start_positions, screen)
-   
     
-    # if winner:
-    #     print(f" PLAYER {str_current_color} WON THE GAME! ")
-    #     pygame.time.delay(2000)  # تاخیر برای نمایش پیغام برنده شدن
-
     return new_position  # اینو اضافه کن که موقعیت جدید رو برگردونه
 
 
