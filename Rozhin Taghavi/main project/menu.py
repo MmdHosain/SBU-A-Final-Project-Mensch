@@ -71,6 +71,6 @@ def menu():
         pygame.display.update()
 
     # pygame.quit() 
-
+print("komak")
 if __name__ == "__main__":
     menu()
