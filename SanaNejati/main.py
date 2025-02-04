@@ -110,7 +110,7 @@ def player_selection():
 
 # Select Colors for Players
 def color_selection(player_number):
-    chosen_colors = []  # لیست رنگ‌های انتخاب‌شده
+    chosen_colors = []  
 
     for i in range(player_number):
         colors = [color for color in COLORS.keys() if color not in chosen_colors]
@@ -118,35 +118,31 @@ def color_selection(player_number):
 
         selecting = True
         while selecting:
-            WIN.fill((0, 0, 0))  # پاک کردن صفحه برای جلوگیری از کشیده شدن متن‌ها روی هم
-
-            # نمایش عنوان برای انتخاب رنگ
+            WIN.fill((0, 0, 0))  
             title_text = FONT.render(f"Player {i + 1}, Choose Your Color", True, (255, 255, 255))
             WIN.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, 50))
 
-            # نمایش رنگ‌ها به صورت لیست
             for j, color in enumerate(colors):
-                color_display = COLORS[color] if j == selected_index else GRAY  # تغییر رنگ انتخاب‌شده
+                color_display = COLORS[color] if j == selected_index else GRAY  
                 color_text = FONT.render(color.capitalize(), True, color_display)
-                WIN.blit(color_text, (WIDTH // 2 - color_text.get_width() // 2, 150 + j * 60))  # تغییر y برای هر رنگ
+                WIN.blit(color_text, (WIDTH // 2 - color_text.get_width() // 2, 150 + j * 60))  
 
             pygame.display.update()
 
-            # مدیریت رویدادها
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     exit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        selected_index = (selected_index - 1) % len(colors)  # حرکت به بالا
+                        selected_index = (selected_index - 1) % len(colors) 
                     elif event.key == pygame.K_DOWN:
-                        selected_index = (selected_index + 1) % len(colors)  # حرکت به پایین
+                        selected_index = (selected_index + 1) % len(colors)  
                     elif event.key == pygame.K_RETURN:
-                        chosen_colors.append(colors[selected_index])  # ذخیره رنگ انتخاب‌شده
-                        selecting = False  # پایان انتخاب برای بازیکن فعلی
+                        chosen_colors.append(colors[selected_index])  
+                        selecting = False 
                     elif event.key == pygame.K_ESCAPE:
-                        return []  # بازگشت به منو
+                        return [] 
 
     return chosen_colors
 
