@@ -17,10 +17,16 @@ FONT_SIZE = 40
 
 # Initialize Pygame
 def init_game():
-    pygame.init()  # Initialize pygame
+    pygame.init()
     pygame.font.init()  # Initialize the font module
+    pygame.mixer.init()  # Initialize the mixer module
     WIN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Mensch by Hossein Akbari")
+
+    # Load and play background music
+    pygame.mixer.music.load("Soghoot.mp3")  # Specify the path to your music file
+    pygame.mixer.music.play(-1)  # Play the music in a loop (-1 means infinite loop)
+
     return WIN
 
 
@@ -277,6 +283,31 @@ def draw_board(WIN, players, current_player, dice_value=None):
         dice_text = f"Dice Roll: {dice_value}"
         draw_text(WIN, dice_text, 490, 750, (255, 255, 255))
     pygame.display.update()
+
+
+# Function to select number of players
+def select_number_of_players(WIN):
+    selected_option = 0
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected_option = (selected_option - 1) % len(PLAYER_OPTIONS)
+                elif event.key == pygame.K_DOWN:
+                    selected_option = (selected_option + 1) % len(PLAYER_OPTIONS)
+                elif event.key == pygame.K_RETURN:
+                    if selected_option < 3:  # If selected 2, 3, or 4 players
+                        start_game(
+                            selected_option + 2, WIN
+                        )  # Convert to actual number of players
+                    elif selected_option == 3:  # Back to Menu
+                        running = False
+
+        draw_player_selection(WIN, selected_option)
+        pygame.time.Clock().tick(FPS)
 
 
 # Main game loop
