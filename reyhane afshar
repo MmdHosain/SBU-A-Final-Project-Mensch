@@ -1,0 +1,555 @@
+import pygame
+import random
+import sys
+import json
+
+# تنظیمات اولیه
+pygame.init()
+WIDTH, HEIGHT = 600, 600
+CELL_SIZE = WIDTH // 13
+ROWS, COLS = 15, 15
+FPS = 30
+
+# رنگ‌ها
+COLORS = {
+    "red": (255, 0, 0),
+    "blue": (0, 0, 255),
+    "green": (0, 255, 0),
+    "yellow": (255, 255, 0),
+    "light_red": (255, 200, 200),
+    "light_blue": (200, 200, 255),
+    "light_green": (200, 255, 200),
+    "light_yellow": (255, 255, 200),
+    "white": (255, 255, 255),
+    "black": (0, 0, 0),
+    "gray": (200, 200, 200),
+}
+
+# مسیر حرکت مهره‌ها
+PATH_POSITIONS = [
+    (2, 5), (3, 5), (4, 5), (5, 5),  
+    (5, 4), (5, 3), (5, 2), (5, 1),  
+    (6, 1), (7, 2), (7, 3), (7, 4), (7, 5),  
+    (8, 5), (9, 5), (10, 5), (11, 5), (11, 6),  
+    (10, 7), (9, 7), (8, 7), (7, 7), (7, 8),  
+    (7, 9), (7, 10), (7, 11), (6, 11),  
+    (5, 11), (5, 10), (5, 9), (5, 8), (5, 7),  
+    (4, 7), (3, 7), (2, 7), (1, 7), (1, 6)  
+]  
+
+
+
+# نقاط ورود 
+ENTRY_POINTS = {
+    "blue": (7,1),
+    "green": (5,11),
+    "red": (1, 5),
+    "yellow": (11,7)
+}
+
+PARKING_POSITIONS = {
+    "red": [(1, 1), (1, 2), (2, 1), (2, 2)],
+    "blue": [(11,1), (10,1), (11,2), (10,2)],
+    "green": [(2,11), (2,10), (1,10), (1,11)],
+    "yellow": [(10,11), (10,10), (11,10), (11,11)]
+}
+
+# مکان‌های وسط صفحه
+CROSS_PATHS = {
+    "blue": [(6,2), (6,3), (6,4), (6,5)],
+    "red": [(3,6), (4,6), (5,6), (2,6)],
+    "yellow": [(9,6), (7,6), (8,6), (10,6)],
+    "green": [(6,7), (6,8), (6,9), (6,10)]
+}
+
+START_PATH_INDEX = {
+    "red": 0,     # اولین نقطه از مسیر برای قرمز
+    "blue": 9,    # اولین نقطه از مسیر برای آبی
+    "green": 27,  # اولین نقطه از مسیر برای سبز
+    "yellow": 18  # اولین نقطه از مسیر برای زرد
+}
+
+# کلاس تنظیمات
+class Settings:
+    def __init__(self):
+        self.data = {"players": 4, "sound": True}
+        self.load()
+
+    def load(self):
+        try:
+            with open("settings.json", "r") as f:
+                self.data = json.load(f)
+        except FileNotFoundError:
+            self.save()
+
+    def save(self):
+        with open("settings.json", "w") as f:
+            json.dump(self.data, f)
+ 
+# کلاس بازیکن
+class Player:
+    def __init__(self, color):
+        self.color = color
+        self.pieces = [None] * 4  # None یعنی مهره در خانه مبدا است
+        self.entry_point = ENTRY_POINTS[color]
+        self.active_pieces = 0
+        
+
+# کلاس منوی پویا
+class Menu:
+    def __init__(self, game):
+        self.game = game
+        self.options = ["New Game", "How To Play", "Exit"]
+        self.selected = 0
+
+    def draw_menu(self):
+        self.game.screen.fill(COLORS["white"])
+        for i, option in enumerate(self.options):
+            color = COLORS["red"] if i == self.selected else COLORS["black"]
+            text = pygame.font.SysFont("Arial", 40).render(option, True, color)
+            self.game.screen.blit(text, (WIDTH//2 - 100, HEIGHT//2 - 50 + i*60))
+        pygame.display.update()
+
+    def handle_input(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    self.selected = (self.selected - 1) % len(self.options)
+                elif event.key == pygame.K_DOWN:
+                    self.selected = (self.selected + 1) % len(self.options)
+                elif event.key == pygame.K_RETURN:
+                    if self.selected == 0:
+                        self.select_players()
+                    elif self.selected == 1:
+                        self.show_help()
+                    elif self.selected == 2:
+                        pygame.quit()
+                        sys.exit()
+    def select_players(self):
+        selecting = True
+        selected_option = 0  # ۰ برای دو نفره، ۱ برای چهار نفره
+        options = ["4 Players", "2 Players"]
+
+        while selecting:
+            self.game.screen.fill(COLORS["white"])
+            font = pygame.font.SysFont("Arial", 40)
+            
+            for i, option in enumerate(options):
+                color = COLORS["red"] if i == selected_option else COLORS["black"]
+                text = font.render(option, True, color)
+                self.game.screen.blit(text, (WIDTH//2 - 100, HEIGHT//2 - 50 + i*60))
+
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                        selected_option = 1 - selected_option  # بین دو گزینه جابه‌جا شود
+                    elif event.key == pygame.K_RETURN:
+                        self.game.settings.data["players"] = 4 if selected_option == 0 else 2
+                        self.game.settings.save()
+                        self.game.run_game()
+                        selecting = False
+    def show_help(self):
+        showing = True
+        help_text = [
+            "🎲 Ludo Game Instructions 🎲",
+            "1. Press SPACE to roll the dice.",
+            "2. Use keys 1-4 to move your pieces.",
+            "3. To start moving a piece, you must roll a 6.",
+            "4. If you land on an opponent's piece,",
+            "they go back to start.",
+            "5. The goal is to get all your pieces to the finish area.",
+            "Press ESC to go back."
+        ]
+
+        while showing:
+            self.game.screen.fill(COLORS["white"])
+            font = pygame.font.SysFont("Arial", 24)
+
+            for i, line in enumerate(help_text):
+                text = font.render(line, True, COLORS["black"])
+                self.game.screen.blit(text, (WIDTH//2 - 200, 100 + i * 40))
+
+            pygame.display.update()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    showing = False
+            
+
+# کلاس اصلی بازی
+class Game:
+    def __init__(self):
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("منچ")
+        self.menu = Menu(self)
+        self.settings = Settings()
+        self.clock = pygame.time.Clock()
+        self.players = [Player("red"), Player("blue")]
+        if self.settings.data["players"] == 4:
+            self.players.extend([Player("green"), Player("yellow")])
+
+
+        self.current_turn = 0
+        self.dice_value = 1
+        self.dice_rolled = False  # وضعیت نشان‌دهنده چرخاندن تاس
+        self.consecutive_sixes = 0  # شمارنده برای تعداد دفعات پشت سر هم تاس 6 آوردن
+
+    def draw_dice(self, dice_value):
+        dice_size = 37 
+        # تعیین موقعیت تاس در پایین وسط صفحه
+        dice_x = (WIDTH - dice_size) // 2  
+        dice_y = HEIGHT - dice_size - 10  # فاصله 10 پیکسل از پایین صفحه
+        dot_radius = 5  # شعاع نقطه‌ها
+        offset = dice_size // 4  # فاصله برای قرارگیری نقاط
+
+        # رسم پس‌زمینه تاس
+        pygame.draw.rect(self.screen, COLORS["white"], (dice_x, dice_y, dice_size, dice_size))
+        pygame.draw.rect(self.screen, COLORS["black"], (dice_x, dice_y, dice_size, dice_size), 2)
+
+        # تعیین موقعیت‌های نقطه‌ها
+        positions = {
+            "top_left": (dice_x + offset, dice_y + offset),
+            "top_right": (dice_x + dice_size - offset, dice_y + offset),
+            "middle": (dice_x + dice_size // 2, dice_y + dice_size // 2),
+            "bottom_left": (dice_x + offset, dice_y + dice_size - offset),
+            "bottom_right": (dice_x + dice_size - offset, dice_y + dice_size - offset),
+            "middle_left": (dice_x + offset, dice_y + dice_size // 2),
+            "middle_right": (dice_x + dice_size - offset, dice_y + dice_size // 2),
+        }
+
+        # رسم نقطه‌ها بر اساس مقدار تاس
+        if dice_value == 1:
+            pygame.draw.circle(self.screen, COLORS["black"], positions["middle"], dot_radius)
+        elif dice_value == 2:
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_right"], dot_radius)
+        elif dice_value == 3:
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["middle"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_right"], dot_radius)
+        elif dice_value == 4:
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_right"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_right"], dot_radius)
+        elif dice_value == 5:
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_right"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["middle"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_right"], dot_radius)
+        elif dice_value == 6:
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["top_right"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["middle_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["middle_right"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_left"], dot_radius)
+            pygame.draw.circle(self.screen, COLORS["black"], positions["bottom_right"], dot_radius)
+    
+
+    def draw_board(self):
+        self.screen.fill(COLORS["white"])
+        # رسم صلیب در وسط صفحه
+          # رنگ‌آمیزی محدوده صلیب برای هر رنگ
+        cross_colors = {
+        
+            "blue": (200, 200, 255),
+            "red": (255, 200, 200),   
+            "green": (200, 255, 200),  
+            "yellow": (255, 255, 200)  # زرد کمرنگ
+        }
+
+        for color, positions in CROSS_PATHS.items():
+            for x,y in positions:
+                pygame.draw.rect(self.screen, cross_colors[color],pygame.Rect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE,CELL_SIZE))
+                pygame.draw.rect(self.screen, COLORS["gray"], (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
+
+
+
+        # رسم مسیر اصلی
+        for pos in PATH_POSITIONS:
+            x, y = pos
+            pygame.draw.rect(self.screen, COLORS["gray"], (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
+
+        # رسم خانه‌های مبدا
+        for color, (x, y) in ENTRY_POINTS.items():
+            pygame.draw.rect(self.screen, COLORS[f"light_{color}"], (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+        # رسم خانه‌های مقصد
+        for color, positions in PARKING_POSITIONS.items():
+            for pos in positions:
+                x, y = pos
+                pygame.draw.rect(self.screen, COLORS[f"light_{color}"], (x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
+        # رسم مهره‌ها و نمایش شماره‌ی آن‌ها
+        font = pygame.font.SysFont("Arial", 18, bold=True)  # فونت برای شماره‌ی مهره‌ها
+        for player in self.players:
+            for i in range(4):
+                if player.pieces[i] is None:
+                    parking_pos = PARKING_POSITIONS[player.color][i]
+                    x, y = parking_pos
+                else:
+                    x, y = player.pieces[i]
+
+                # رسم مهره (دایره)
+                pygame.draw.circle(
+                    self.screen,
+                    COLORS[player.color],
+                    (x * CELL_SIZE + CELL_SIZE // 2, y * CELL_SIZE + CELL_SIZE // 2),
+                    CELL_SIZE // 3
+                )
+
+                # نمایش شماره‌ی مهره روی دایره
+                text = font.render(str(i + 1), True, COLORS["black"])  # شماره مهره (1 تا 4)
+                self.screen.blit(text, (x * CELL_SIZE + CELL_SIZE // 2 - 5, y * CELL_SIZE + CELL_SIZE // 2 - 10))
+
+        #  نمایش تیمی که نوبت اوست در بالای وسط صفحه**
+        current_player = self.players[self.current_turn]
+        font = pygame.font.SysFont("Arial", 24, bold=True)  # فونت بزرگ‌تر برای نمایش نوبت بازیکن
+        text = font.render(f"NOBAT: {current_player.color.upper()}", True, COLORS[current_player.color])
+        
+        text_rect = text.get_rect(center=(WIDTH // 2, 30))  # تنظیم متن در مرکز بالا
+        self.screen.blit(text, text_rect)
+
+        # رسم تاس
+        self.draw_dice(self.dice_value)
+
+        pygame.display.update()
+    SKIP_POSITIONS = set(ENTRY_POINTS.values())
+    def move_piece(self, player, piece_index, dice):
+        current_pos = player.pieces[piece_index]
+        
+        
+        if player.pieces[piece_index] is None:
+            if dice == 6:
+                entry_position = ENTRY_POINTS[player.color]
+                player.pieces[piece_index] = entry_position  # مهره وارد خانه ورودی شد
+                player.active_pieces += 1
+                print(f" مهره {piece_index+1} بازیکن {player.color} وارد خانه ورودی شد: {entry_position}")
+
+    
+            return
+
+        # اگر مهره در خانه ورودی است و باید وارد مسیر اصلی شود
+        if current_pos == ENTRY_POINTS[player.color]:
+            start_index = START_PATH_INDEX[player.color]
+            new_index = start_index + (dice - 1)
+            if new_index >= len(PATH_POSITIONS): 
+                new_index = len(PATH_POSITIONS) - 1
+            player.pieces[piece_index] = PATH_POSITIONS[new_index]
+            print(f"🚀 مهره {piece_index+1} وارد مسیر شد: {PATH_POSITIONS[new_index]}")
+            return
+
+        # اگر مهره در مسیر اصلی قرار دارد
+        if current_pos in PATH_POSITIONS:
+            idx = PATH_POSITIONS.index(current_pos)
+            new_idx = idx + dice 
+            # اگر مهره به ورودی صلیب رسید
+            if new_idx >= len(PATH_POSITIONS):  
+                player.pieces[piece_index] = CROSS_PATHS[player.color][0]  # ورود به صلیب
+                print(f"✅ مهره {piece_index+1} از {player.color} وارد صلیب شد!")
+                return
+            player.pieces[piece_index] = PATH_POSITIONS[new_idx]
+            print(f"🚀 مهره {piece_index+1} به خانه {player.pieces[piece_index]} حرکت کرد.")
+            return
+
+
+            # اگر مهره به انتهای مسیر اصلی رسید، وارد صلیب شود
+        if current_pos in ENTRY_POINTS.values() and player.color in CROSS_PATHS:
+                color = player.color  # رنگ بازیکن فعلی
+                if current_pos == ENTRY_POINTS[color]-1:  # اگر مهره به ورودی صلیب خودش رسید
+                    print(f"✅ مهره {piece_index+1} از {color} وارد صلیب شد!")
+                    player.pieces[piece_index] = CROSS_PATHS[color][0]  # اولین خانه صلیب
+                    return
+            # حرکت عادی در مسیر اصلی
+                player.pieces[piece_index] = PATH_POSITIONS[new_idx]
+                return
+
+        if current_pos in CROSS_PATHS[player.color]:
+            idx = CROSS_PATHS[player.color].index(current_pos)
+            if idx == len(CROSS_PATHS[player.color]) - 1:  # اگر مهره در آخر صلیب است
+                player.pieces[piece_index] = PARKING_POSITIONS[player.color][0]  # ورود به پارکینگ
+                print(f"🎉 مهره {piece_index+1} وارد پارکینگ شد: {player.pieces[piece_index]}")
+                return
+
+        if current_pos in PARKING_POSITIONS[player.color]:
+            idx = PARKING_POSITIONS[player.color].index(current_pos)
+            new_idx = min(idx + dice, len(PARKING_POSITIONS[player.color]) - 1)  
+            player.pieces[piece_index] = PARKING_POSITIONS[player.color][new_idx]
+            print(f"🏡 مهره {piece_index+1} در پارکینگ حرکت کرد: {player.pieces[piece_index]}")
+            return
+
+
+        # اگر مهره در صلیب است، باید حرکت کند
+        if current_pos in CROSS_PATHS[player.color]:
+            idx = CROSS_PATHS[player.color].index(current_pos)
+            new_idx = idx + dice
+
+            if new_idx >= len(CROSS_PATHS[player.color]):  # اگر مهره به آخرین خانه صلیب رسید، متوقف شود
+                new_idx = len(CROSS_PATHS[player.color]) - 1
+
+            player.pieces[piece_index] = CROSS_PATHS[player.color][new_idx]
+            print(f"🔷 مهره {piece_index+1} در صلیب حرکت کرد: {player.pieces[piece_index]}")
+            return
+          
+
+        # بررسی برخورد مهره‌های حریف
+        new_pos = player.pieces[piece_index]  # موقعیت جدید مهره
+
+        SAFE_ZONES = [8, 21, 34, 47]  # مثال: خانه‌های امن که مهره‌ها در آنجا قابل ضربه نیستند
+        for p in self.players:
+            if p == player:  # بررسی نکنیم که مهره خودش را بزند
+                continue 
+            for i in range(4):
+                if p.pieces[i] == new_pos:  # بررسی برخورد
+                    if new_pos in SAFE_ZONES:
+                        print(f"🛡 مهره {i+1} بازیکن {p.color} در خانه امن است و قابل زدن نیست!")
+                        continue  # مهره در خانه امن است، نمی‌توان آن را زد
+                    
+                    if new_pos not in PARKING_POSITIONS[p.color]:  # بررسی خانه پارکینگ
+                        print(f"⚡ مهره {i+1} بازیکن {p.color} توسط بازیکن {player.color} زده شد!")
+                        p.pieces[i] = None  # مهره حریف به خانه مبدا باز می‌گردد
+                        print(f"🔄 مهره {i+1} بازیکن {p.color} به خانه مبدا بازگشت!")
+
+
+    def next_turn(self):
+        """ تغییر نوبت به بازیکن بعدی """
+        self.current_turn = (self.current_turn + 1) % len(self.players)
+        self.dice_rolled = False  # بعد از تغییر نوبت، تاس هنوز چرخیده نشده
+        self.consecutive_sixes = 0  # شمارنده را ریست کنید
+
+      
+    def roll_dice_until_six(self):
+        """ تاس را می‌چرخاند تا زمانی که بازیکن 6 بیاورد """
+        while True:
+            self.dice_value = random.randint(1, 6)
+            self.dice_rolled = True  # تاس انداخته شد
+            print(f" بازیکن {self.players[self.current_turn].color} مقدار {self.dice_value} آورد.")
+
+            if self.dice_value == 6:
+                print(f" بازیکن {self.players[self.current_turn].color} مقدار 6 آورد و جایزه گرفت!")
+                break  # از حلقه خارج شو، چون 6 آورده است
+            else:
+                print(f" بازیکن {self.players[self.current_turn].color} باید دوباره تاس بیندازد.")
+                # منتظر فشردن دوباره‌ی Space می‌مانیم
+                self.wait_for_space()
+
+        return self.dice_value
+    def roll_dice(self):
+            """ مدیریت انداختن تاس، با امکان انداختن مجدد در صورت آوردن 6 """
+            self.dice_value = random.randint(1, 6)
+            self.dice_rolled = True  # تاس انداخته شد
+            print(f"🎲 بازیکن {self.players[self.current_turn].color} مقدار {self.dice_value} آورد.")
+
+            if self.dice_value == 6:
+                self.dice_value =random.randint(1,6)
+                self.consecutive_sixes += 1
+                print(f"🎉 بازیکن {self.players[self.current_turn].color} مقدار 6 آورد و جایزه گرفت! 🎁")
+                if self.consecutive_sixes >= 3:  # اگر سه بار پشت سر هم تاس 6 آورد
+                    print(f"🚨 بازیکن {self.players[self.current_turn].color} سه بار پشت سر هم تاس 6 آورد! نوبت به بازیکن بعدی می‌رود.")
+                    self.next_turn()
+            else:
+                self.next_turn()  # نوبت به بازیکن بعدی می‌رود
+            return self.dice_value 
+    def check_win(self):
+            for player in self.players:
+                parked = 0
+                for pos in player.pieces:
+                    if pos is not None and pos in CROSS_PATHS[player.color][-1]:
+                        parked += 1
+                if parked == 4:
+                    return player
+            return None
+    def run_game(self):
+        running = True
+        while running:
+            self.clock.tick(FPS)
+            self.draw_board()
+            current_player = self.players[self.current_turn]
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                    sys.exit()
+
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE and not self.dice_rolled:  # چرخاندن تاس فقط با اسپیس
+                        self.dice_value = self.roll_dice()
+                        print(f"بازیکن {current_player.color} تاس انداخت: {self.dice_value}")
+                        self.dice_rolled = True  # نشان‌دهنده این که تاس چرخانده شده
+
+                        # بررسی اگر هیچ مهره‌ای قابل حرکت نبود، تاس دوباره چرخانده شود
+                        movable_pieces = [i for i in range(4) if self.can_move_piece(current_player, i, self.dice_value)]
+                        if not movable_pieces:
+                            print(f"⛔ هیچ مهره‌ای از {current_player.color} نمی‌تواند حرکت کند! دوباره تاس بزنید.")
+                            self.dice_rolled = False  # اجازه چرخاندن مجدد تاس
+                            continue  # منتظر فشردن دوباره‌ی SPACE می‌مانیم
+
+                    if self.dice_rolled and event.key in [pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4]:
+                        piece_index = event.key - pygame.K_1  # محاسبه ایندکس مهره
+                        if piece_index in movable_pieces:
+                            self.move_piece(current_player, piece_index, self.dice_value)
+                            self.draw_board()
+
+                            winner = self.check_win()
+                            if winner:
+                                print(f"🏆 بازیکن {winner.color} برنده شد!")
+                                running = False
+
+                            # اگر 6 نیامده باشد، نوبت تغییر کند
+                            if self.dice_value != 6 or not any(p is not None for p in current_player.pieces):
+                                self.current_turn = (self.current_turn + 1) % len(self.players)
+                            self.dice_rolled = False
+
+
+
+                    pygame.display.update()
+
+    def can_move_piece(self, player, piece_index, dice):
+        """ بررسی می‌کند که آیا یک مهره می‌تواند حرکت کند یا نه """
+        if player.pieces[piece_index] is None:
+            return dice == 6  # فقط با 6 می‌تواند وارد شود
+
+        current_pos = player.pieces[piece_index]
+
+        # اگر مهره در خانه ورودی است، بررسی کنیم که آیا می‌تواند وارد مسیر شود
+        if current_pos == ENTRY_POINTS[player.color]:
+            start_index = START_PATH_INDEX[player.color]
+            new_index = start_index + (dice - 1)
+            return new_index < len(PATH_POSITIONS)  # بررسی اینکه آیا در محدوده مسیر هست یا نه
+
+        # بررسی مسیر عادی
+        if current_pos in PATH_POSITIONS:
+            idx = PATH_POSITIONS.index(current_pos)
+            new_idx = idx + dice
+            return new_idx < len(PATH_POSITIONS)  # اگر حرکت معتبر باشد
+
+        # بررسی خانه‌های مقصد (پارکینگ)
+        if current_pos in PARKING_POSITIONS[player.color]:
+            idx = PARKING_POSITIONS[player.color].index(current_pos)
+            new_idx = idx + dice
+            return new_idx < len(PARKING_POSITIONS[player.color])  # مهره در محدوده پارکینگ حرکت کند
+
+        return False
+
+
+    def run(self):
+        while True:
+            self.menu.draw_menu()
+            self.menu.handle_input()
+
+if __name__ == "__main__":
+    game = Game()
+    game.run()
